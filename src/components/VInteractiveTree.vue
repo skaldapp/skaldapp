@@ -91,11 +91,18 @@ const $q = useQuasar(),
   expanded = ref([nodes[0]?.id]),
   qtree = $(useTemplateRef<QTree>("qtree")),
   { add, addChild, down, left, remove, right, up } = sharedStore,
-  { putObject } = ioStore,
+  { deleteObject, putObject } = ioStore,
   { putPages, putSitemap } = mainStore,
   { t } = useI18n();
 
-const clickAdd = () => {
+const cleaner = (value: TPage[]) => {
+    value.forEach((page) => {
+      const { children, id } = page;
+      if (children.length) cleaner(children as TPage[]);
+      if (id) void deleteObject(`pages/${id}.md`);
+    });
+  },
+  clickAdd = () => {
     if (selected) {
       const id = kvNodes[selected]?.parent ? add(selected) : addChild(selected);
       if (id) {
@@ -126,8 +133,12 @@ const clickAdd = () => {
         title: t("Confirm"),
       }).onOk(() => {
         if (selected) {
-          const id = remove(selected);
-          if (id) selected = id;
+          const deleted = kvNodes[selected],
+            id = remove(selected);
+          if (id) {
+            if (deleted) cleaner([deleted]);
+            selected = id;
+          }
         }
       });
     state = true;
