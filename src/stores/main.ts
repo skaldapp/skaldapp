@@ -75,13 +75,13 @@ export const highlighter = await createHighlighterCore({
         const putObjectDebounced = debounce(() => {
           if (model)
             void putObject(
-              `docs/${id}.md`,
+              `pages/${id}.md`,
               model.getValue(),
               "text/markdown",
             ).catch(consola.error);
         }, second);
         if (!model) {
-          const value = await getObjectText(`docs/${id}.md`, cache);
+          const value = await getObjectText(`pages/${id}.md`, cache);
           model = editor.createModel(
             value ||
               `---
