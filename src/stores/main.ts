@@ -95,7 +95,7 @@ attrs:
     - max-w-none
 flat: true
 hidden: false
-icon: fluent-color:document-text-16
+icon: i-twemoji:page-facing-up
 ---
 `,
             "markdown",
