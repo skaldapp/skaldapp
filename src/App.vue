@@ -56,7 +56,7 @@ watch(bucket, async (value) => {
             ].filter(Boolean) as string[],
           ),
       ),
-      files = ["robots.txt"];
+      files = ["robots.txt", ".nojekyll"];
 
     tree = JSON.parse(getIndex ?? "[{}]");
     domain.value = cname;
