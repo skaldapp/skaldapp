@@ -1,5 +1,5 @@
 <template lang="pug">
-.scroll.q-pa-md.col.self-stretch(@vue:mounted="scrollToEnd")
+.scroll.q-pa-md.col.self-stretch
   q-chat-message(
     v-for="{ parts, role, id } in chat.messages",
     :key="id",
@@ -46,8 +46,31 @@ import subscript from "markdown-it-sub";
 import superscript from "markdown-it-sup";
 import taskLists from "markdown-it-task-lists";
 import { immediate } from "stores/defaults";
-import { nextTick, useTemplateRef, watch } from "vue";
+import { nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+
+/* -------------------------------------------------------------------------- */
+
+const apiKey = useStorage("apiKey", ""),
+  block = "end",
+  chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
+  message = ref(""),
+  safePrompt = true,
+  mistral = { safePrompt },
+  plugins = [
+    abbreviation,
+    deflist,
+    emoji,
+    footnote,
+    insert,
+    mark,
+    subscript,
+    superscript,
+    taskLists,
+  ],
+  providerOptions = { mistral };
+
+/* -------------------------------------------------------------------------- */
 
 class CustomChatTransport implements ChatTransport<UIMessage> {
   private model: LanguageModel | undefined;
@@ -64,7 +87,7 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
       const result = streamText({
         messages: await convertToModelMessages(messages),
         model: this.model,
-        providerOptions: { mistral: { safePrompt: true } },
+        providerOptions,
       });
       return result.toUIMessageStream();
     } else throw new Error("The model is not defined.");
@@ -74,45 +97,25 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
   }
 }
 
-let message = $ref("");
+/* -------------------------------------------------------------------------- */
 
-const chatMessages = $(
-  useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
-);
-
-const apiKey = useStorage("apiKey", ""),
-  scrollToEnd = () => {
-    void nextTick(() => {
-      chatMessages?.[chatMessages.length - 1]?.$el.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
-    });
-  },
-  transport = new CustomChatTransport(),
+const transport = new CustomChatTransport(),
   chat = new Chat({
-    onData: scrollToEnd,
-    onFinish: scrollToEnd,
     transport,
-  }),
-  plugins = [
-    abbreviation,
-    deflist,
-    emoji,
-    footnote,
-    insert,
-    mark,
-    subscript,
-    superscript,
-    taskLists,
-  ],
-  send = async () => {
-    void chat.sendMessage({ text: message });
-    message = "";
-    await nextTick();
-    scrollToEnd();
-  },
-  { t } = useI18n();
+  });
+
+/* -------------------------------------------------------------------------- */
+
+const { t } = useI18n();
+
+/* -------------------------------------------------------------------------- */
+
+const send = () => {
+  void chat.sendMessage({ text: message.value });
+  message.value = "";
+};
+
+/* -------------------------------------------------------------------------- */
 
 watch(
   apiKey,
@@ -124,6 +127,16 @@ watch(
     );
   },
   { immediate },
+);
+
+watch(
+  () => chat.lastMessage,
+  async () => {
+    await nextTick();
+    chatMessages.value?.[chatMessages.value.length - 1]?.$el.scrollIntoView({
+      block,
+    });
+  },
 );
 </script>
 
