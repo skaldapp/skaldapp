@@ -57,12 +57,7 @@ const $q = useQuasar(),
           // console.error(error);
         },
         requestHandler: ({ body }) => copilot.complete({ body }),
-        technologies: [
-          "vue",
-          "tailwindcss",
-          "markdown",
-          "mdc (markdown components)",
-        ],
+        technologies: ["vue", "tailwindcss", "markdown"],
       });
     }
   },
