@@ -51,27 +51,6 @@ import { useI18n } from "vue-i18n";
 
 /* -------------------------------------------------------------------------- */
 
-const apiKey = useStorage("apiKey", ""),
-  block = "end",
-  chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
-  message = ref(""),
-  safePrompt = true,
-  mistral = { safePrompt },
-  plugins = [
-    abbreviation,
-    deflist,
-    emoji,
-    footnote,
-    insert,
-    mark,
-    subscript,
-    superscript,
-    taskLists,
-  ],
-  providerOptions = { mistral };
-
-/* -------------------------------------------------------------------------- */
-
 class CustomChatTransport implements ChatTransport<UIMessage> {
   private model: LanguageModel | undefined;
   constructor(model?: LanguageModel) {
@@ -87,7 +66,6 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
       const result = streamText({
         messages: await convertToModelMessages(messages),
         model: this.model,
-        providerOptions,
       });
       return result.toUIMessageStream();
     } else throw new Error("The model is not defined.");
@@ -99,10 +77,25 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
 
 /* -------------------------------------------------------------------------- */
 
-const transport = new CustomChatTransport(),
+const apiKey = useStorage("apiKey", ""),
+  block = "end",
+  transport = new CustomChatTransport(),
   chat = new Chat({
     transport,
-  });
+  }),
+  chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
+  message = ref(""),
+  plugins = [
+    abbreviation,
+    deflist,
+    emoji,
+    footnote,
+    insert,
+    mark,
+    subscript,
+    superscript,
+    taskLists,
+  ];
 
 /* -------------------------------------------------------------------------- */
 
