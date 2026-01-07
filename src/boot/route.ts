@@ -1,5 +1,5 @@
 import { defineBoot } from "#q-app/wrappers";
-import { sharedStore } from "@vuebro/shared";
+import { sharedStore } from "@skaldapp/shared";
 import routes from "src/router/routes";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";

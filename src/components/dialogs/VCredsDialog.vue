@@ -75,7 +75,7 @@ q-dialog(ref="dialogRef", @hide="onDialogHide")
 <script setup lang="ts">
 import type { QInput } from "quasar";
 
-import { sharedStore } from "@vuebro/shared";
+import { sharedStore } from "@skaldapp/shared";
 import { useStorage } from "@vueuse/core";
 import endpoints from "assets/endpoints.json";
 import regions from "assets/regions.json";

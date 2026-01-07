@@ -1,6 +1,6 @@
 import type { StreamingBlobPayloadInputTypes } from "@smithy/types";
 
-import * as fsa from "@vuebro/fsa";
+import * as fsa from "@skaldapp/fsa";
 import * as s3 from "stores/s3";
 import { reactive, watchEffect } from "vue";
 

@@ -3,7 +3,7 @@ router-view
 </template>
 
 <script setup lang="ts">
-import { sharedStore } from "@vuebro/shared";
+import { sharedStore } from "@skaldapp/shared";
 import { consola } from "consola/browser";
 import { editor } from "monaco-editor";
 import { storeToRefs } from "pinia";

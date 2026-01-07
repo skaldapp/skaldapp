@@ -1,12 +1,12 @@
-import type { TPage } from "@vuebro/shared";
+import type { TPage } from "@skaldapp/shared";
 
 import mdc from "@shikijs/langs/mdc";
 import vue from "@shikijs/langs/vue";
 import lightTheme from "@shikijs/themes/github-light-default";
 import darkTheme from "@shikijs/themes/nord";
+import { sharedStore } from "@skaldapp/shared";
 import { InferSeoMetaPlugin } from "@unhead/addons";
 import { createHead, renderSSRHead } from "@unhead/vue/server";
-import { sharedStore } from "@vuebro/shared";
 import { useFetch } from "@vueuse/core";
 import { consola } from "consola/browser";
 import { parse } from "hexo-front-matter";

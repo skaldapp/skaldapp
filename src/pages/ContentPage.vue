@@ -63,7 +63,7 @@ import type { TouchPanValue } from "quasar";
 import type { TAppPage } from "stores/main";
 
 import { MilkdownProvider } from "@milkdown/vue";
-import { sharedStore } from "@vuebro/shared";
+import { sharedStore } from "@skaldapp/shared";
 import { useStorage, useWindowSize } from "@vueuse/core";
 import VAiChat from "components/VAiChat.vue";
 import VInteractiveTree from "components/VInteractiveTree.vue";

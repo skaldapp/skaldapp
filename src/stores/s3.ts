@@ -9,8 +9,8 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { sharedStore } from "@skaldapp/shared";
 import { FetchHttpHandler } from "@smithy/fetch-http-handler";
-import { sharedStore } from "@vuebro/shared";
 import { useStorage } from "@vueuse/core";
 import { AES, Utf8 } from "crypto-es";
 import { mergeDefaults } from "stores/defaults";

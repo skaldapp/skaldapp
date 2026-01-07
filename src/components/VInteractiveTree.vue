@@ -54,10 +54,10 @@ q-page-sticky(:offset="[15, 15]", position="bottom-right")
         )
 </template>
 <script setup lang="ts">
-import type { TPage } from "@vuebro/shared";
+import type { TPage } from "@skaldapp/shared";
 import type { QTree } from "quasar";
 
-import { sharedStore } from "@vuebro/shared";
+import { sharedStore } from "@skaldapp/shared";
 import { consola } from "consola/browser";
 import { storeToRefs } from "pinia";
 import { debounce, useQuasar } from "quasar";
