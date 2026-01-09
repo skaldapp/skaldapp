@@ -66,6 +66,7 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
       const result = streamText({
         messages: await convertToModelMessages(messages),
         model: this.model,
+        providerOptions: { mistral: { safePrompt: true } },
       });
       return result.toUIMessageStream();
     } else throw new Error("The model is not defined.");
