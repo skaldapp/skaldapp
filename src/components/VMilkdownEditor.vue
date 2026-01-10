@@ -25,7 +25,7 @@ import { useStorage, useStyleTag } from "@vueuse/core";
 import { generateText } from "ai";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
-import { debounce, useQuasar } from "quasar";
+import { debounce, Lang, useQuasar } from "quasar";
 import { cancel, immediate, persistent, second } from "stores/defaults";
 import { ioStore } from "stores/io";
 import { highlighter, useMainStore } from "stores/main";
@@ -54,6 +54,8 @@ const $q = useQuasar(),
 
 **Instructions:**
 - Analyze the context, tone, and style of any provided text fragment
+- Maintain the same language as the input text unless otherwise specified
+- In case the language cannot be determined, use the '${Lang.getLocale() ?? "en-US"}' locale
 - Ensure grammatical correctness and semantic coherence in all completions
 - Maintain consistency with the established voice and register
 - For new sentence generation, consider the broader context of the conversation or subject matter
