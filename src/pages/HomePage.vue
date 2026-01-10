@@ -1,15 +1,16 @@
 <template lang="pug">
-q-drawer(v-model="rightDrawer", show-if-above, side="right")
-  q-card(flat)
+q-drawer.no-scroll(v-model="rightDrawer", show-if-above, side="right")
+  q-card.fit.column.no-wrap(flat)
     q-card-section(v-if="$q.platform.is.electron || isFileSystemAccess()")
       q-btn.fit(color="primary", :label="t('Open...')", push, @click="getDir")
-    q-card-section
+    q-card-section.q-mx-md(horizontal)
       q-item
         q-item-section(avatar)
           q-icon.q-pa-sm(name="storage")
         q-item-section
           .text-overline {{ t("S3 Accounts") }}
-    q-card-section.q-scroll
+    q-separator(inset)
+    q-card-section.col.scroll
       q-list
         q-item(
           v-for="[name, cred] in Object.entries(credential).sort()",
@@ -45,28 +46,27 @@ q-drawer(v-model="rightDrawer", show-if-above, side="right")
                 @click="(evt: Event) => { evt.stopPropagation(); edit(name); }"
               )
     q-card-actions(vertical)
-      q-btn(fab, icon="add", round, @click="add")
-q-page.column
-  .col.column.q-ma-md
-    q-card.absolute-center(flat)
-      q-card-section
-        q-timeline(layout="comfortable", side="left")
-          q-timeline-entry(icon="home", :title="t('Homepage')")
-            template(#subtitle)
-              a.text-no-wrap(
-                :href="`https://${t('skaldapp.github.io')}`",
-                rel="noopener noreferrer",
-                target="_blank"
-              ) {{ t("skaldapp.github.io") }}
-          q-timeline-entry(icon="share", :title="t('Repository')")
-            template(#subtitle)
-              a.text-no-wrap(
-                href="https://github.com/skaldapp",
-                rel="noopener noreferrer",
-                target="_blank"
-              ) github.com/skaldapp
-      q-card-section
-        .text-overline {{ t("ver") }}.: {{ APP_VERSION }}
+      q-btn.q-ma-md(fab, icon="add", round, @click="add")
+q-page.column.no-scroll
+  q-card.absolute-center(flat)
+    q-card-section
+      q-timeline(layout="comfortable", side="left")
+        q-timeline-entry(icon="home", :title="t('Homepage')")
+          template(#subtitle)
+            a.text-no-wrap(
+              :href="`https://${t('skaldapp.github.io')}`",
+              rel="noopener noreferrer",
+              target="_blank"
+            ) {{ t("skaldapp.github.io") }}
+        q-timeline-entry(icon="share", :title="t('Repository')")
+          template(#subtitle)
+            a.text-no-wrap(
+              href="https://github.com/skaldapp",
+              rel="noopener noreferrer",
+              target="_blank"
+            ) github.com/skaldapp
+    q-card-section
+      .text-overline {{ t("ver") }}.: {{ APP_VERSION }}
 </template>
 <script setup lang="ts">
 import { sharedStore } from "@skaldapp/shared";
@@ -86,6 +86,8 @@ import { toRef, triggerRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
+/* -------------------------------------------------------------------------- */
+
 const $q = useQuasar(),
   APP_VERSION = __APP_VERSION__,
   defaultCredentials = toRef(sharedStore, "credentials"),
@@ -93,10 +95,15 @@ const $q = useQuasar(),
     mergeDefaults,
   }),
   mainStore = useMainStore(),
-  router = useRouter(),
-  { headBucket, setFileSystemDirectoryHandle } = ioStore,
+  router = useRouter();
+
+/* -------------------------------------------------------------------------- */
+
+const { headBucket, setFileSystemDirectoryHandle } = ioStore,
   { rightDrawer } = storeToRefs(mainStore),
   { t } = useI18n();
+
+/* -------------------------------------------------------------------------- */
 
 const add = () => {
     $q.dialog({ component: VCredsDialog, componentProps: { persistent } });
@@ -197,6 +204,8 @@ const add = () => {
       triggerRef(credential);
     });
   };
+
+/* -------------------------------------------------------------------------- */
 
 const edit = async (name: number | string) => {
   try {
