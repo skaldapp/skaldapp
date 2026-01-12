@@ -31,7 +31,6 @@ q-btn-dropdown.q-mr-xs(auto-close, dropdown-icon="apps", flat, square, stretch)
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
 import VFaviconDialog from "components/dialogs/VFaviconDialog.vue";
-import { consola } from "consola/browser";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { cache, persistent } from "stores/defaults";
@@ -43,11 +42,10 @@ const $q = useQuasar(),
   ai = useStorage("apiKey", ""),
   cancel = true,
   mainStore = useMainStore(),
+  { domain } = storeToRefs(mainStore),
   { getObjectText, putObject } = ioStore,
   { putPages, putSitemap } = mainStore,
   { t } = useI18n();
-
-let { domain } = $(storeToRefs(mainStore));
 
 const clickAI = () => {
     $q.dialog({
@@ -76,14 +74,14 @@ const clickAI = () => {
           /\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/.test(
             val,
           ),
-        model: domain,
+        model: domain.value,
       },
       title: t("Domain"),
     }).onOk((value: string) => {
-      domain = value;
-      putObject("CNAME", domain, "text/plain").catch(consola.error);
-      putSitemap().catch(consola.error);
-      putPages().catch(consola.error);
+      domain.value = value;
+      putObject("CNAME", domain.value, "text/plain").catch(console.error);
+      putSitemap().catch(console.error);
+      putPages().catch(console.error);
     });
   },
   clickRobots = async () => {
@@ -97,7 +95,7 @@ const clickAI = () => {
       prompt: { model: await getObjectText(title, cache), type: "textarea" },
       title,
     }).onOk((data: string) => {
-      putObject(title, data, "text/plain").catch(consola.error);
+      putObject(title, data, "text/plain").catch(console.error);
     });
   };
 </script>
