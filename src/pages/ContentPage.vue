@@ -76,32 +76,21 @@ import { useMainStore } from "stores/main";
 import { computed, ref, toRefs, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 
-/* -------------------------------------------------------------------------- */
-
 const $q = useQuasar(),
   apiKey = useStorage("apiKey", ""),
   mainStore = useMainStore(),
-  tab = ref("wysiwyg");
-
-/* -------------------------------------------------------------------------- */
-
-const { kvNodes, nodes, tree } = toRefs(sharedStore),
+  tab = ref("wysiwyg"),
+  { kvNodes, nodes, tree } = toRefs(sharedStore),
   { leftDrawer, rightDrawer } = storeToRefs(mainStore),
   { selected } = storeToRefs(mainStore),
   { t } = useI18n(),
   { width } = useWindowSize();
 
-/* -------------------------------------------------------------------------- */
-
 let initialLeftDrawerWidth = 300,
   initialRightDrawerWidth = width.value / 2;
 
-/* -------------------------------------------------------------------------- */
-
 const leftDrawerWidth = ref(initialLeftDrawerWidth),
   rightDrawerWidth = ref(initialRightDrawerWidth);
-
-/* -------------------------------------------------------------------------- */
 
 const clickAI = () => {
     $q.dialog({
@@ -144,8 +133,6 @@ const clickAI = () => {
       (kvNodes.value[selected.value] ?? nodes.value[0]) as TAppPage | undefined,
   );
 
-/* -------------------------------------------------------------------------- */
-
 watchEffect(() => {
   if (
     leftDrawer.value &&
@@ -162,8 +149,6 @@ watchEffect(() => {
     rightDrawerWidth.value = width.value / 2;
   else if ($q.screen.lt.md) rightDrawerWidth.value = width.value;
 });
-
-/* -------------------------------------------------------------------------- */
 
 rightDrawer.value = false;
 </script>
