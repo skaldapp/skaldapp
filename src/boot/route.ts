@@ -3,19 +3,20 @@ import { sharedStore } from "@skaldapp/shared";
 import routes from "src/router/routes";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
+import { toRef } from "vue";
 
-const tree = $toRef(sharedStore, "tree");
-const mainStore = useMainStore();
+const [route] = routes,
+  mainStore = useMainStore(),
+  tree = toRef(sharedStore, "tree");
 
 export default defineBoot(({ router }) => {
-  const [route] = routes;
   router.beforeEach(({ path }, _from, next) => {
     if (["/", "/main"].includes(path)) next();
     else next("/");
     if (path === "/" && route) {
       ioStore.bucket = "";
       mainStore.selected = "";
-      tree.length = 0;
+      tree.value.length = 0;
       router.clearRoutes();
       router.addRoute(route);
     }
