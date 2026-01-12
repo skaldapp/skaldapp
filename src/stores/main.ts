@@ -8,7 +8,6 @@ import { sharedStore } from "@skaldapp/shared";
 import { InferSeoMetaPlugin } from "@unhead/addons";
 import { createHead, renderSSRHead } from "@unhead/vue/server";
 import { useFetch } from "@vueuse/core";
-import { consola } from "consola/browser";
 import { parse } from "hexo-front-matter";
 import { editor, Uri } from "monaco-editor";
 import { acceptHMRUpdate, defineStore } from "pinia";
@@ -29,33 +28,33 @@ export type TAppPage = TPage & {
   contenteditable: boolean;
 };
 
-const { kvNodes, nodes } = $(toRefs(sharedStore));
-
 const oldPages: string[] = [],
-  parseFrontmatter = (id: string) => {
-    const model = editor.getModel(Uri.parse(`file:///${id}.md`));
-    if (model && kvNodes[id])
-      try {
-        const frontmatter = parse(model.getValue());
-        delete frontmatter._content;
-        if (
-          JSON.stringify(kvNodes[id].frontmatter) !==
-          JSON.stringify(frontmatter)
-        )
-          kvNodes[id].frontmatter = frontmatter;
-      } catch (error) {
-        const { message } = error as Error;
-        if (JSON.stringify(kvNodes[id].frontmatter) !== JSON.stringify({}))
-          kvNodes[id].frontmatter = {};
-        return message;
-      }
-    return "";
-  },
   { data: body } = useFetch(`runtime/index.html`).text(),
   { data: manifest } = useFetch("runtime/.vite/manifest.json").json<
     Record<string, Record<string, string>>
   >(),
-  { deleteObject, getObjectText, putObject, removeEmptyDirectories } = ioStore;
+  { deleteObject, getObjectText, putObject, removeEmptyDirectories } = ioStore,
+  { kvNodes, nodes } = toRefs(sharedStore);
+
+const parseFrontmatter = (id: string) => {
+  const model = editor.getModel(Uri.parse(`file:///${id}.md`));
+  if (model && kvNodes.value[id])
+    try {
+      const frontmatter = parse(model.getValue());
+      delete frontmatter._content;
+      if (
+        JSON.stringify(kvNodes.value[id].frontmatter) !==
+        JSON.stringify(frontmatter)
+      )
+        kvNodes.value[id].frontmatter = frontmatter;
+    } catch (error) {
+      const { message } = error as Error;
+      if (JSON.stringify(kvNodes.value[id].frontmatter) !== JSON.stringify({}))
+        kvNodes.value[id].frontmatter = {};
+      return message;
+    }
+  return "";
+};
 
 export const highlighter = await createHighlighterCore({
     engine: createOnigurumaEngine(options),
@@ -78,7 +77,7 @@ export const highlighter = await createHighlighterCore({
               `pages/${id}.md`,
               model.getValue(),
               "text/markdown",
-            ).catch(consola.error);
+            ).catch(console.error);
         }, second);
         if (!model) {
           const value = await getObjectText(`pages/${id}.md`, cache);
@@ -116,7 +115,7 @@ icon: twemoji:page-facing-up
       putPages = async () => {
         const promises: Promise<void>[] = [];
         oldPages.forEach((url) => {
-          if (!(nodes as TAppPage[]).find(({ path }) => path === url))
+          if (!(nodes.value as TAppPage[]).find(({ path }) => path === url))
             promises.push(
               deleteObject(url ? `${url}/index.html` : "index.html"),
             );
@@ -124,7 +123,7 @@ icon: twemoji:page-facing-up
         await Promise.allSettled(promises);
         await removeEmptyDirectories();
         oldPages.length = 0;
-        (nodes as TAppPage[]).forEach(({ branch, path }) => {
+        (nodes.value as TAppPage[]).forEach(({ branch, path }) => {
           if (path !== undefined) {
             oldPages.push(path);
             const vueHeadClient = createHead({
@@ -169,8 +168,7 @@ ${headTags}
                     "text/html",
                   );
                 } catch (error) {
-                  const { message } = error as Error;
-                  consola.error(message);
+                  console.error(error);
                 }
             })();
           }
@@ -179,7 +177,7 @@ ${headTags}
       putSitemap = async () => {
         await putObject(
           "sitemap.txt",
-          (nodes as TPage[])
+          (nodes.value as TPage[])
             .map(({ frontmatter: { hidden }, to }) =>
               domain.value && to && !hidden
                 ? `https://${domain.value}${to === "/" ? "" : encodeURI(to)}`
