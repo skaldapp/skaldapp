@@ -5,25 +5,23 @@ import { fileURLToPath } from "url";
 
 let mainWindow: BrowserWindow | undefined;
 
-const currentDir = fileURLToPath(new URL(".", import.meta.url));
+const currentDir = fileURLToPath(new URL(".", import.meta.url)),
+  devTools = false,
+  icon = path.resolve(currentDir, "icons/icon.png"),
+  preload = path.resolve(
+    currentDir,
+    path.join(
+      process.env.QUASAR_ELECTRON_PRELOAD_FOLDER,
+      `electron-preload${process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION}`,
+    ),
+  ),
+  sandbox = false,
+  show = false,
+  webPreferences = { devTools, preload, sandbox },
+  width = 1000;
 
 const createWindow = async () => {
-  mainWindow = new BrowserWindow({
-    icon: path.resolve(currentDir, "icons/icon.png"),
-    show: false,
-    webPreferences: {
-      devTools: false,
-      preload: path.resolve(
-        currentDir,
-        path.join(
-          process.env.QUASAR_ELECTRON_PRELOAD_FOLDER,
-          `electron-preload${process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION}`,
-        ),
-      ),
-      sandbox: false,
-    },
-    width: 1000,
-  });
+  mainWindow = new BrowserWindow({ icon, show, webPreferences, width });
   enable(mainWindow.webContents);
   if (process.env.DEV) await mainWindow.loadURL(process.env.APP_URL);
   else await mainWindow.loadFile("index.html");
