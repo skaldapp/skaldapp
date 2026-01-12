@@ -3,7 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import type { CompletionRegistration } from "monacopilot";
+import type {
+  CompletionRegistration,
+  CompletionRequestBody,
+} from "monacopilot";
 
 import { useStorage } from "@vueuse/core";
 import { split } from "hexo-front-matter";
@@ -19,62 +22,71 @@ let completion: CompletionRegistration | null = null,
   editor: monaco.editor.IStandaloneCodeEditor | null = null,
   model: monaco.editor.ITextModel | null = null;
 
-const monacoRef = $(useTemplateRef<HTMLElement>("monacoRef"));
 const $q = useQuasar(),
+  ambiguousCharacters = false,
   apiKey = useStorage("apiKey", ""),
-  frontmatter = (value: string) => {
-    if (value && model) {
+  automaticLayout = true,
+  enabled = true,
+  bracketPairColorization = { enabled },
+  detectIndentation = false,
+  endColumn = 1,
+  fixedOverflowWidgets = true,
+  formatOnPaste = true,
+  formatOnType = true,
+  mainStore = useMainStore(),
+  monacoRef = useTemplateRef<HTMLElement>("monacoRef"),
+  onError = console.error,
+  provider = "mistral",
+  scrollBeyondLastLine = false,
+  severity = monaco.MarkerSeverity.Error,
+  startColumn = 1,
+  startLineNumber = 2,
+  tabSize = 2,
+  technologies = ["vue", "tailwindcss", "markdown"],
+  unicodeHighlight = { ambiguousCharacters },
+  { getModel } = mainStore,
+  { message, selected } = storeToRefs(mainStore);
+
+const frontmatter = (message: string) => {
+    if (message && model) {
       const { data, prefixSeparator, separator } = split(model.getValue());
       if (data && separator === "---" && prefixSeparator)
         monaco.editor.setModelMarkers(model, "frontmatter", [
           {
-            endColumn: 1,
+            endColumn,
             endLineNumber: data.split("\n").length + 2,
-            message: value,
-            severity: monaco.MarkerSeverity.Error,
-            startColumn: 1,
-            startLineNumber: 2,
+            message,
+            severity,
+            startColumn,
+            startLineNumber,
           },
         ]);
     } else monaco.editor.removeAllMarkers("frontmatter");
   },
-  mainStore = useMainStore(),
   monacopilot = (value: string) => {
     completion?.deregister();
     completion = null;
     if (value && editor && model) {
       const copilot = new CompletionCopilot(value, {
           model: "codestral",
-          provider: "mistral",
+          provider,
         }),
+        language = model.getLanguageId(),
+        requestHandler = ({ body }: { body: CompletionRequestBody }) =>
+          copilot.complete({ body }),
         {
-          uri: { path },
+          uri: { path: filename },
         } = model;
+
       completion = registerCompletion(monaco, editor, {
-        filename: path,
-        language: model.getLanguageId(),
-        onError: () => {
-          // console.error(error);
-        },
-        requestHandler: ({ body }) => copilot.complete({ body }),
-        technologies: ["vue", "tailwindcss", "markdown"],
+        filename,
+        language,
+        onError,
+        requestHandler,
+        technologies,
       });
     }
-  },
-  { getModel } = mainStore,
-  { message, selected } = storeToRefs(mainStore);
-
-defineExpose({
-  getSelection: () => {
-    const selection = editor?.getSelection() ?? null;
-    const value =
-      selection && !selection.isEmpty()
-        ? (model?.getValueInRange(selection) ?? null)
-        : null;
-    editor?.trigger("editor", "cancelSelection", {});
-    return value;
-  },
-});
+  };
 
 watch(apiKey, monacopilot);
 watch(message, frontmatter);
@@ -95,18 +107,18 @@ onMounted(() => {
       if (editor) editor.setModel(model);
       else {
         editor =
-          monacoRef &&
-          monaco.editor.create(monacoRef, {
-            automaticLayout: true,
-            bracketPairColorization: { enabled: true },
-            detectIndentation: false,
-            fixedOverflowWidgets: true,
-            formatOnPaste: true,
-            formatOnType: true,
+          monacoRef.value &&
+          monaco.editor.create(monacoRef.value, {
+            automaticLayout,
+            bracketPairColorization,
+            detectIndentation,
+            fixedOverflowWidgets,
+            formatOnPaste,
+            formatOnType,
             model,
-            scrollBeyondLastLine: false,
-            tabSize: 2,
-            unicodeHighlight: { ambiguousCharacters: false },
+            scrollBeyondLastLine,
+            tabSize,
+            unicodeHighlight,
           });
         monacopilot(apiKey.value);
         frontmatter(message.value);
