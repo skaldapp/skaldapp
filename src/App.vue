@@ -4,25 +4,22 @@ router-view
 
 <script setup lang="ts">
 import { sharedStore } from "@skaldapp/shared";
-import { consola } from "consola/browser";
 import { editor } from "monaco-editor";
 import { storeToRefs } from "pinia";
 import { cache, writable } from "stores/defaults";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
-import { toRef, watch, watchEffect } from "vue";
-
-let tree = $toRef(sharedStore, "tree");
+import { toRef, toRefs, watch } from "vue";
 
 const bucket = toRef(ioStore, "bucket"),
   mainStore = useMainStore(),
-  nodes = $toRef(sharedStore, "nodes"),
   { deleteObject, getObjectText, headObject, putObject } = ioStore,
   { domain } = storeToRefs(mainStore),
-  { manifest, putPages } = mainStore;
+  { manifest, putPages } = mainStore,
+  { nodes, tree } = toRefs(sharedStore);
 
-watchEffect(() => {
-  nodes.forEach((object) => {
+watch(nodes, (value) => {
+  value.forEach((object) => {
     if (!("contenteditable" in object))
       Object.defineProperty(object, "contenteditable", {
         value: false,
@@ -58,7 +55,7 @@ watch(bucket, async (value) => {
       ),
       files = ["robots.txt", ".nojekyll"];
 
-    tree = JSON.parse(getIndex ?? "[{}]");
+    tree.value = JSON.parse(getIndex ?? "[{}]");
     domain.value = cname;
     if (localManifest && serverManifest) {
       (
@@ -71,7 +68,7 @@ watch(bucket, async (value) => {
       [...serverManifest]
         .filter((x) => !localManifest.has(x))
         .forEach((element) => {
-          deleteObject(element).catch(consola.error);
+          deleteObject(element).catch(console.error);
         });
 
       await Promise.allSettled(
@@ -87,10 +84,10 @@ watch(bucket, async (value) => {
           }),
       );
 
-      putPages().catch(consola.error);
+      putPages().catch(console.error);
     }
   } else {
-    tree.length = 0;
+    tree.value.length = 0;
 
     editor.getModels().forEach((model) => {
       model.dispose();
