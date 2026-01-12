@@ -73,7 +73,6 @@ import { sharedStore } from "@skaldapp/shared";
 import { useStorage } from "@vueuse/core";
 import VCredsDialog from "components/dialogs/VCredsDialog.vue";
 import VOtpDialog from "components/dialogs/VOtpDialog.vue";
-import { consola } from "consola/browser";
 import { AES, Utf8 } from "crypto-es";
 import ContentPage from "pages/ContentPage.vue";
 import { storeToRefs } from "pinia";
@@ -86,8 +85,6 @@ import { toRef, triggerRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
-/* -------------------------------------------------------------------------- */
-
 const $q = useQuasar(),
   APP_VERSION = __APP_VERSION__,
   defaultCredentials = toRef(sharedStore, "credentials"),
@@ -95,15 +92,10 @@ const $q = useQuasar(),
     mergeDefaults,
   }),
   mainStore = useMainStore(),
-  router = useRouter();
-
-/* -------------------------------------------------------------------------- */
-
-const { headBucket, setFileSystemDirectoryHandle } = ioStore,
+  router = useRouter(),
+  { headBucket, setFileSystemDirectoryHandle } = ioStore,
   { rightDrawer } = storeToRefs(mainStore),
   { t } = useI18n();
-
-/* -------------------------------------------------------------------------- */
 
 const add = () => {
     $q.dialog({ component: VCredsDialog, componentProps: { persistent } });
@@ -117,7 +109,7 @@ const add = () => {
       component: MainLayout,
       path,
     });
-    router.push(path).catch(consola.error);
+    router.push(path).catch(console.error);
   },
   getDir = async () => {
     if ($q.platform.is.electron) {
@@ -204,8 +196,6 @@ const add = () => {
       triggerRef(credential);
     });
   };
-
-/* -------------------------------------------------------------------------- */
 
 const edit = async (name: number | string) => {
   try {
