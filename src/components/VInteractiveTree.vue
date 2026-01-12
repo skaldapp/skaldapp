@@ -47,16 +47,29 @@ q-page-sticky(:offset="[15, 15]", position="bottom-right")
           :error="error(prop.node)",
           :error-message="errorMessage(prop.node)",
           hide-bottom-space,
+          :input-class="{ 'text-strike': prop.node.frontmatter.hidden }",
           outlined,
           :readonly="!prop.node.contenteditable",
           @click.stop="selected = prop.node.id",
           @keyup.enter="prop.node.contenteditable = false"
         )
+          template(#prepend)
+            Icon(
+              v-if="prop.node.frontmatter.icon",
+              :icon="prop.node.frontmatter.icon"
+            )
+          template(#append)
+            q-icon(v-if="prop.node.frontmatter.flat", name="account_tree")
+            q-icon(
+              v-if="prop.node.frontmatter.template",
+              name="picture_in_picture_alt"
+            )
 </template>
 <script setup lang="ts">
 import type { TPage } from "@skaldapp/shared";
 import type { QTree } from "quasar";
 
+import { Icon } from "@iconify/vue";
 import { sharedStore } from "@skaldapp/shared";
 import { consola } from "consola/browser";
 import { storeToRefs } from "pinia";
