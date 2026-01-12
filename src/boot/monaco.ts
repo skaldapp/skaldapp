@@ -8,6 +8,8 @@ import { configureMonacoTailwindcss } from "monaco-tailwind";
 import TailwindWorker from "monaco-tailwind/tailwind.worker?worker";
 import { highlighter } from "stores/main";
 
+const languageSelector = ["markdown"];
+
 window.MonacoEnvironment = {
   getWorker: (workerId: string, label: string) => {
     switch (label) {
@@ -22,5 +24,5 @@ window.MonacoEnvironment = {
 };
 
 configureMonacoSFC(monaco);
-configureMonacoTailwindcss(monaco, { languageSelector: ["markdown"] });
+configureMonacoTailwindcss(monaco, { languageSelector });
 shikiToMonaco(highlighter, monaco);
