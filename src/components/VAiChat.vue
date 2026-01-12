@@ -49,8 +49,6 @@ import { immediate } from "stores/defaults";
 import { nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-/* -------------------------------------------------------------------------- */
-
 class CustomChatTransport implements ChatTransport<UIMessage> {
   private model: LanguageModel | undefined;
   constructor(model?: LanguageModel) {
@@ -76,14 +74,10 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-
 const apiKey = useStorage("apiKey", ""),
   block = "end",
   transport = new CustomChatTransport(),
-  chat = new Chat({
-    transport,
-  }),
+  chat = new Chat({ transport }),
   chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
   message = ref(""),
   plugins = [
@@ -96,20 +90,12 @@ const apiKey = useStorage("apiKey", ""),
     subscript,
     superscript,
     taskLists,
-  ];
-
-/* -------------------------------------------------------------------------- */
-
-const { t } = useI18n();
-
-/* -------------------------------------------------------------------------- */
-
-const send = () => {
-  void chat.sendMessage({ text: message.value });
-  message.value = "";
-};
-
-/* -------------------------------------------------------------------------- */
+  ],
+  send = () => {
+    void chat.sendMessage({ text: message.value });
+    message.value = "";
+  },
+  { t } = useI18n();
 
 watch(
   apiKey,
