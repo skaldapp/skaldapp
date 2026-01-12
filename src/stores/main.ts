@@ -91,11 +91,14 @@ meta:
     content: Description
 attrs:
   class:
+    - container
+    - mx-auto
     - prose
     - max-w-none
-flat: true
+flat: false
 hidden: false
-icon: i-twemoji:page-facing-up
+template: false
+icon: twemoji:page-facing-up
 ---
 `,
             "markdown",
@@ -121,7 +124,7 @@ icon: i-twemoji:page-facing-up
         await Promise.allSettled(promises);
         await removeEmptyDirectories();
         oldPages.length = 0;
-        (nodes as TAppPage[]).forEach(({ branch, frontmatter, path }) => {
+        (nodes as TAppPage[]).forEach(({ branch, path }) => {
           if (path !== undefined) {
             oldPages.push(path);
             const vueHeadClient = createHead({
@@ -138,16 +141,18 @@ icon: i-twemoji:page-facing-up
                 InferSeoMetaPlugin(),
               ],
             });
-            if (nodes[0]?.frontmatter !== frontmatter)
-              vueHeadClient.push(nodes[0]?.frontmatter);
-            vueHeadClient.push({
-              ...frontmatter,
-              base: {
-                href:
-                  Array(branch.length - 1)
-                    .fill("..")
-                    .join("/") || "./",
-              },
+            branch.forEach(({ frontmatter }, index) => {
+              if (branch.length - 1 === index)
+                vueHeadClient.push({
+                  ...frontmatter,
+                  base: {
+                    href:
+                      Array(branch.length - 1)
+                        .fill("..")
+                        .join("/") || "./",
+                  },
+                });
+              else if (frontmatter.template) vueHeadClient.push(frontmatter);
             });
             void (async () => {
               if (body.value)
