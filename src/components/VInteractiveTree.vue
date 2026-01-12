@@ -71,7 +71,6 @@ import type { QTree } from "quasar";
 
 import { Icon } from "@iconify/vue";
 import { sharedStore } from "@skaldapp/shared";
-import { consola } from "consola/browser";
 import { storeToRefs } from "pinia";
 import { debounce, useQuasar } from "quasar";
 import { cancel, deep, immediate, persistent, second } from "stores/defaults";
@@ -80,19 +79,22 @@ import { useMainStore } from "stores/main";
 import { ref, toRefs, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-const mainStore = useMainStore();
-
-let state = $ref(false),
-  visible = $ref(false),
-  { selected } = $(storeToRefs(mainStore));
-
-const { kvNodes, nodes } = $(toRefs(sharedStore));
-
 const $q = useQuasar(),
-  errors = [
+  mainStore = useMainStore(),
+  qtree = useTemplateRef<QTree>("qtree"),
+  state = ref(false),
+  visible = ref(false),
+  { add, addChild, down, left, remove, right, up } = sharedStore,
+  { deleteObject, putObject } = ioStore,
+  { kvNodes, nodes } = toRefs(sharedStore),
+  { putPages, putSitemap } = mainStore,
+  { selected } = storeToRefs(mainStore),
+  { t } = useI18n();
+
+const errors = [
     (propNode: TPage) => !propNode.name,
     (propNode: TPage) =>
-      !!nodes.find(
+      !!nodes.value.find(
         (element) =>
           propNode.path &&
           ((element.id !== propNode.id && element.path === propNode.path) ||
@@ -101,12 +103,7 @@ const $q = useQuasar(),
     (propNode: TPage) =>
       ["?", "\\", "#"].some((value) => propNode.name?.includes(value)),
   ],
-  expanded = ref([nodes[0]?.id]),
-  qtree = $(useTemplateRef<QTree>("qtree")),
-  { add, addChild, down, left, remove, right, up } = sharedStore,
-  { deleteObject, putObject } = ioStore,
-  { putPages, putSitemap } = mainStore,
-  { t } = useI18n();
+  expanded = ref([nodes.value[0]?.id]);
 
 const cleaner = (value: TPage[]) => {
     value.forEach((page) => {
@@ -116,56 +113,58 @@ const cleaner = (value: TPage[]) => {
     });
   },
   clickAdd = () => {
-    if (selected) {
-      const id = kvNodes[selected]?.parent ? add(selected) : addChild(selected);
+    if (selected.value) {
+      const id = kvNodes.value[selected.value]?.parent
+        ? add(selected.value)
+        : addChild(selected.value);
       if (id) {
-        if (kvNodes[selected]?.children.length)
-          qtree?.setExpanded(selected, true);
-        selected = id;
+        if (kvNodes.value[selected.value]?.children.length)
+          qtree.value?.setExpanded(selected.value, true);
+        selected.value = id;
       }
     }
-    state = true;
+    state.value = true;
   },
   clickDown = () => {
-    if (selected) down(selected);
-    state = true;
+    if (selected.value) down(selected.value);
+    state.value = true;
   },
   clickLeft = () => {
-    if (selected) {
-      const id = left(selected);
-      if (id) qtree?.setExpanded(id, true);
+    if (selected.value) {
+      const id = left(selected.value);
+      if (id) qtree.value?.setExpanded(id, true);
     }
-    state = true;
+    state.value = true;
   },
   clickRemove = () => {
-    if (kvNodes[selected]?.parent)
+    if (kvNodes.value[selected.value]?.parent)
       $q.dialog({
         cancel,
         message: t("Do you really want to delete?"),
         persistent,
         title: t("Confirm"),
       }).onOk(() => {
-        if (selected) {
-          const deleted = kvNodes[selected],
-            id = remove(selected);
+        if (selected.value) {
+          const deleted = kvNodes.value[selected.value],
+            id = remove(selected.value);
           if (id) {
             if (deleted) cleaner([deleted]);
-            selected = id;
+            selected.value = id;
           }
         }
       });
-    state = true;
+    state.value = true;
   },
   clickRight = () => {
-    if (selected) {
-      const id = right(selected);
-      if (id) qtree?.setExpanded(id, true);
+    if (selected.value) {
+      const id = right(selected.value);
+      if (id) qtree.value?.setExpanded(id, true);
     }
-    state = true;
+    state.value = true;
   },
   clickUp = () => {
-    if (selected) up(selected);
-    state = true;
+    if (selected.value) up(selected.value);
+    state.value = true;
   },
   error = (propNode: TPage) =>
     errors
@@ -188,22 +187,22 @@ const cleaner = (value: TPage[]) => {
   onIntersection = (entry: IntersectionObserverEntry) => {
     if (
       entry.target instanceof HTMLElement &&
-      entry.target.dataset.id === selected
+      entry.target.dataset.id === selected.value
     )
-      visible = entry.isIntersecting;
+      visible.value = entry.isIntersecting;
     return true;
   };
 
 watch(
-  $$(selected),
+  selected,
   (newVal, oldVal) => {
-    visible = true;
+    visible.value = true;
     if (!newVal) {
-      const [{ id } = {}] = nodes;
-      selected = id ?? "";
+      const [{ id } = {}] = nodes.value;
+      selected.value = id ?? "";
     }
-    if (oldVal && kvNodes[oldVal])
-      Reflect.defineProperty(kvNodes[oldVal], "contenteditable", {
+    if (oldVal && kvNodes.value[oldVal])
+      Reflect.defineProperty(kvNodes.value[oldVal], "contenteditable", {
         value: false,
       });
   },
@@ -211,15 +210,15 @@ watch(
 );
 
 watch(
-  $$(nodes),
+  nodes,
   debounce((value) => {
     putObject(
       "index.json",
       JSON.stringify([value[0]]),
       "application/json",
-    ).catch(consola.error);
-    putSitemap().catch(consola.error);
-    putPages().catch(consola.error);
+    ).catch(console.error);
+    putSitemap().catch(console.error);
+    putPages().catch(console.error);
   }, second),
   { deep },
 );
