@@ -22,30 +22,30 @@ import { ioStore } from "stores/io";
 import { useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
-const uploader = $(useTemplateRef<QUploader>("uploader"));
-
-const { putObject } = ioStore,
-  { t } = useI18n();
 const $q = useQuasar(),
-  factory = async (files: readonly File[]) => {
-    const [file] = files;
-    let message = t("Favicon uploaded successfully");
-    try {
-      if (file)
-        await putObject(
-          "favicon.ico",
-          new Uint8Array(await file.arrayBuffer()),
-          "image/vnd.microsoft.icon",
-        );
-      else throw new Error();
-      uploader?.reset();
-    } catch {
-      message = t("Favicon upload failed");
-    }
-    $q.notify({ message });
-    return Promise.reject(new Error());
-  },
-  { dialogRef, onDialogHide } = useDialogPluginComponent();
+  uploader = useTemplateRef<QUploader>("uploader"),
+  { dialogRef, onDialogHide } = useDialogPluginComponent(),
+  { putObject } = ioStore,
+  { t } = useI18n();
+
+const factory = async (files: readonly File[]) => {
+  const [file] = files;
+  let message = t("Favicon uploaded successfully");
+  try {
+    if (file)
+      await putObject(
+        "favicon.ico",
+        new Uint8Array(await file.arrayBuffer()),
+        "image/vnd.microsoft.icon",
+      );
+    else throw new Error();
+    uploader.value?.reset();
+  } catch {
+    message = t("Favicon upload failed");
+  }
+  $q.notify({ message });
+  return Promise.reject(new Error());
+};
 
 defineEmits(useDialogPluginComponent.emits);
 </script>
