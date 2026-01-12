@@ -31,27 +31,26 @@ import type { ComponentPublicInstance } from "vue";
 
 import { AES } from "crypto-es";
 import { useDialogPluginComponent } from "quasar";
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const { model } = defineProps<{ model: string | undefined }>();
 
-const fields = $ref<QInput[]>([]),
-  fieldValues = $ref<number[]>([]),
+const error = ref(false),
+  fields = ref<QInput[]>([]),
+  fieldValues = ref<number[]>([]),
   length = 4,
-  payload = computed(() => fieldValues.filter(Boolean).join("")),
+  payload = computed(() => fieldValues.value.filter(Boolean).join("")),
+  selected = ref(0),
   { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
 
-let error = $ref(false),
-  selected = $ref(0);
-
 const focus = (index: number) => {
-    if (index >= 0 && index < length) selected = index;
+    if (index >= 0 && index < length) selected.value = index;
   },
   updateFieldRef = (
     element: ComponentPublicInstance | Element | null,
     index: number,
   ) => {
-    fields[index] = element as QInput;
+    fields.value[index] = element as QInput;
   };
 
 defineEmits(useDialogPluginComponent.emits);
@@ -60,14 +59,14 @@ watch(
   payload,
   (value) => {
     if (value.length === length) {
-      if (model) error = !AES.decrypt(model, value).toString();
-      if (!error) onDialogOK(value);
-    } else error = false;
+      if (model) error.value = !AES.decrypt(model, value).toString();
+      if (!error.value) onDialogOK(value);
+    } else error.value = false;
   },
   { deep: true },
 );
 
-watch($$(selected), (value) => {
-  fields[value]?.select();
+watch(selected, (value) => {
+  fields.value[value]?.select();
 });
 </script>
