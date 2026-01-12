@@ -32,8 +32,6 @@ import { highlighter, useMainStore } from "stores/main";
 import { onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-/* -------------------------------------------------------------------------- */
-
 const $q = useQuasar(),
   apiKey = useStorage("apiKey", ""),
   dark = "nord",
@@ -82,29 +80,56 @@ Output: "This approach yielded statistically significant results across all expe
 `,
   themes = { dark, light },
   urls = new Map(),
-  yaml = "---";
-
-/* -------------------------------------------------------------------------- */
-
-const { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
+  yaml = "---",
+  { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
   { getModel } = mainStore,
   { getObjectBlob, headObject, putObject } = ioStore,
   { selected } = storeToRefs(mainStore),
   { t } = useI18n();
 
-/* -------------------------------------------------------------------------- */
-
 let front = "",
   model: LanguageModel | undefined,
   textModel = await getModel(selected.value);
-
-/* -------------------------------------------------------------------------- */
 
 const clearUrls = () => {
     [...urls.values()].forEach((url) => {
       URL.revokeObjectURL(url);
     });
     urls.clear();
+  },
+  onUpload = async (file: File) => {
+    const { name, type } = file;
+    const filePath = `uploads/${name}`,
+      message = t("The file is already exist, do you want to replace it?"),
+      title = t("Confirm");
+
+    try {
+      await headObject(filePath);
+      await new Promise((resolve, reject) => {
+        $q.dialog({ cancel, message, persistent, title })
+          .onOk(() => {
+            reject(new Error());
+          })
+          .onCancel(() => {
+            resolve(undefined);
+          });
+      });
+      urls.set(filePath, URL.createObjectURL(await getObjectBlob(filePath)));
+    } catch {
+      void putObject(filePath, new Uint8Array(await file.arrayBuffer()), type);
+      urls.set(filePath, URL.createObjectURL(file));
+    }
+    return filePath;
+  },
+  proxyDomURL = async (url: string) => {
+    if (!urls.has(url) && !URL.canParse(url)) {
+      const image = await getObjectBlob(url);
+      if (image.size) urls.set(url, URL.createObjectURL(image));
+    }
+    return urls.get(url) ?? url;
+  },
+  featureConfigs = {
+    [Crepe.Feature.ImageBlock]: { onUpload, proxyDomURL },
   },
   getHint = async ({ get }: Ctx, view: EditorView) => {
     const {
@@ -137,165 +162,123 @@ const clearUrls = () => {
     }
   },
   init = () => ({ deco, message }),
-  onUpload = async (file: File) => {
-    const { name, type } = file;
-    const filePath = `uploads/${name}`,
-      message = t("The file is already exist, do you want to replace it?"),
-      title = t("Confirm");
+  { get } = useEditor((root) => {
+    const defaultValue = getValue(),
+      crepe = new Crepe({ defaultValue, featureConfigs, root });
 
-    try {
-      await headObject(filePath);
-      await new Promise((resolve, reject) => {
-        $q.dialog({ cancel, message, persistent, title })
-          .onOk(() => {
-            reject(new Error());
-          })
-          .onCancel(() => {
-            resolve(undefined);
-          });
-      });
-      urls.set(filePath, URL.createObjectURL(await getObjectBlob(filePath)));
-    } catch {
-      void putObject(filePath, new Uint8Array(await file.arrayBuffer()), type);
-      urls.set(filePath, URL.createObjectURL(file));
-    }
-    return filePath;
-  },
-  proxyDomURL = async (url: string) => {
-    if (!urls.has(url) && !URL.canParse(url)) {
-      const image = await getObjectBlob(url);
-      if (image.size) urls.set(url, URL.createObjectURL(image));
-    }
-    return urls.get(url) ?? url;
-  };
+    void crepe.editor.remove(htmlSchema);
 
-/* -------------------------------------------------------------------------- */
-
-const featureConfigs = {
-  [Crepe.Feature.ImageBlock]: { onUpload, proxyDomURL },
-};
-
-/* -------------------------------------------------------------------------- */
-
-const { get } = useEditor((root) => {
-  const defaultValue = getValue(),
-    crepe = new Crepe({ defaultValue, featureConfigs, root });
-
-  void crepe.editor.remove(htmlSchema);
-
-  crepe
-    .on((api) => {
-      api.markdownUpdated((ctx, markdown) => {
-        textModel.setValue(
-          front
-            ? `${yaml}
+    crepe
+      .on((api) => {
+        api.markdownUpdated((ctx, markdown) => {
+          textModel.setValue(
+            front
+              ? `${yaml}
 ${front}
 ${yaml}
 
 ${markdown}`
-            : markdown,
-        );
-      });
-    })
-    .editor.use(emoji)
-    .use(
-      htmlSchema.extendSchema((prev) => (ctx) => ({
-        ...prev(ctx),
-        toDOM: (node) => {
-          const div = document.createElement("div");
-          div.innerHTML = highlighter.codeToHtml(node.attrs.value, {
-            lang,
-            themes,
-          });
-          div.classList = "rounded-borders q-card--bordered";
-          return [
-            "span",
-            {
-              ...ctx.get(htmlAttr.key)(node),
-              "data-type": "html",
-              "data-value": node.attrs.value,
-            },
-            div,
-          ];
-        },
-      })),
-    )
-    .use(
-      $prose(
-        (ctx) =>
-          new Plugin({
-            key,
-            props: {
-              decorations: (state) => key.getState(state).deco,
-              handleKeyDown(view, event) {
-                const { dispatch, state } = view,
-                  { message } = key.getState(state),
-                  { schema, tr } = state;
-                const { content } = ctx.get(parserCtx)(message);
+              : markdown,
+          );
+        });
+      })
+      .editor.use(emoji)
+      .use(
+        htmlSchema.extendSchema((prev) => (ctx) => ({
+          ...prev(ctx),
+          toDOM: (node) => {
+            const div = document.createElement("div");
+            div.innerHTML = highlighter.codeToHtml(node.attrs.value, {
+              lang,
+              themes,
+            });
+            div.classList = "rounded-borders q-card--bordered";
+            return [
+              "span",
+              {
+                ...ctx.get(htmlAttr.key)(node),
+                "data-type": "html",
+                "data-value": node.attrs.value,
+              },
+              div,
+            ];
+          },
+        })),
+      )
+      .use(
+        $prose(
+          (ctx) =>
+            new Plugin({
+              key,
+              props: {
+                decorations: (state) => key.getState(state).deco,
+                handleKeyDown(view, event) {
+                  const { dispatch, state } = view,
+                    { message } = key.getState(state),
+                    { schema, tr } = state;
+                  const { content } = ctx.get(parserCtx)(message);
 
-                dispatch(tr.setMeta(key, ""));
-                switch (event.key) {
-                  case "Enter":
-                    void getHint(ctx, view);
-                    break;
-                  case "Tab":
-                    event.preventDefault();
-                    dispatch(
-                      tr.replaceSelection(
-                        DOMParser.fromSchema(schema).parseSlice(
-                          DOMSerializer.fromSchema(schema).serializeFragment(
-                            content,
+                  dispatch(tr.setMeta(key, ""));
+                  switch (event.key) {
+                    case "Enter":
+                      void getHint(ctx, view);
+                      break;
+                    case "Tab":
+                      event.preventDefault();
+                      dispatch(
+                        tr.replaceSelection(
+                          DOMParser.fromSchema(schema).parseSlice(
+                            DOMSerializer.fromSchema(schema).serializeFragment(
+                              content,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                    return true;
-                }
+                      );
+                      return true;
+                  }
+                },
+                handleTextInput: debounce((view, from, to, text) => {
+                  if (text === " ") void getHint(ctx, view);
+                }, second),
               },
-              handleTextInput: debounce((view, from, to, text) => {
-                if (text === " ") void getHint(ctx, view);
-              }, second),
-            },
-            state: {
-              apply(tr, value, prevState, { doc, schema }) {
-                const message = tr.getMeta(key),
-                  { content } = ctx.get(parserCtx)(message),
-                  {
-                    selection: {
-                      $anchor: { parentOffset },
-                      to,
-                    },
-                  } = tr;
-                return typeof message === "string"
-                  ? {
-                      deco: message.length
-                        ? DecorationSet.create(doc, [
-                            Decoration.widget(
-                              to + Number(!parentOffset),
-                              DOMSerializer.fromSchema(
-                                schema,
-                              ).serializeFragment(
-                                content,
-                                {},
-                                document.createElement("pre"),
+              state: {
+                apply(tr, value, prevState, { doc, schema }) {
+                  const message = tr.getMeta(key),
+                    { content } = ctx.get(parserCtx)(message),
+                    {
+                      selection: {
+                        $anchor: { parentOffset },
+                        to,
+                      },
+                    } = tr;
+                  return typeof message === "string"
+                    ? {
+                        deco: message.length
+                          ? DecorationSet.create(doc, [
+                              Decoration.widget(
+                                to + Number(!parentOffset),
+                                DOMSerializer.fromSchema(
+                                  schema,
+                                ).serializeFragment(
+                                  content,
+                                  {},
+                                  document.createElement("pre"),
+                                ),
                               ),
-                            ),
-                          ])
-                        : DecorationSet.empty,
-                      message,
-                    }
-                  : value;
+                            ])
+                          : DecorationSet.empty,
+                        message,
+                      }
+                    : value;
+                },
+                init,
               },
-              init,
-            },
-          }),
-      ),
-    );
+            }),
+        ),
+      );
 
-  return crepe;
-});
-
-/* -------------------------------------------------------------------------- */
+    return crepe;
+  });
 
 watch(selected, async (value) => {
   textModel = await getModel(value);
@@ -320,8 +303,6 @@ watch(
   },
   { immediate },
 );
-
-/* -------------------------------------------------------------------------- */
 
 onUnmounted(clearUrls);
 </script>
