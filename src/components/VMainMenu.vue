@@ -33,14 +33,13 @@ import { useStorage } from "@vueuse/core";
 import VFaviconDialog from "components/dialogs/VFaviconDialog.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { cache, persistent } from "stores/defaults";
+import { cache, cancel, persistent } from "stores/defaults";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
   ai = useStorage("apiKey", ""),
-  cancel = true,
   mainStore = useMainStore(),
   { domain } = storeToRefs(mainStore),
   { getObjectText, putObject } = ioStore,
