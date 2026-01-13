@@ -29,6 +29,6 @@ declare module "pinia" {
 
 export default defineStore((/* { ssrContext } */) => {
   const pinia = createPinia();
-  pinia.use(storePlugin({ decrypt, encrypt, stores: ["main"] }));
+  pinia.use(storePlugin({ decrypt, encrypt, stores: ["skald"] }));
   return pinia;
 });
