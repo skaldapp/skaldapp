@@ -21,7 +21,7 @@ import { $prose } from "@milkdown/kit/utils";
 import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
-import { useStorage, useStyleTag } from "@vueuse/core";
+import { useStyleTag } from "@vueuse/core";
 import { generateText } from "ai";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
@@ -33,7 +33,6 @@ import { onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
-  apiKey = useStorage("apiKey", ""),
   dark = "nord",
   deco = DecorationSet.empty,
   key = new PluginKey("MilkdownCopilot"),
@@ -81,10 +80,10 @@ Output: "This approach yielded statistically significant results across all expe
   themes = { dark, light },
   urls = new Map(),
   yaml = "---",
+  { apiKey, selected } = storeToRefs(mainStore),
   { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
   { getModel } = mainStore,
   { getObjectBlob, headObject, putObject } = ioStore,
-  { selected } = storeToRefs(mainStore),
   { t } = useI18n();
 
 let front = "",
