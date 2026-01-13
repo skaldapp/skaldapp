@@ -61,8 +61,9 @@ export const highlighter = await createHighlighterCore({
     langs: [vue, mdc],
     themes: [lightTheme, darkTheme],
   }),
-  useMainStore = defineStore("main", () => {
-    const domain = ref(""),
+  useMainStore = defineStore("skald", () => {
+    const apiKey = ref(""),
+      domain = ref(""),
       leftDrawer = ref(false),
       message = ref(""),
       rightDrawer = ref(false),
@@ -190,6 +191,7 @@ ${headTags}
       };
 
     return {
+      apiKey,
       body,
       domain,
       getModel,
