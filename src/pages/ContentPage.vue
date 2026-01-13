@@ -64,7 +64,7 @@ import type { TAppPage } from "stores/main";
 
 import { MilkdownProvider } from "@milkdown/vue";
 import { sharedStore } from "@skaldapp/shared";
-import { useStorage, useWindowSize } from "@vueuse/core";
+import { useWindowSize } from "@vueuse/core";
 import VAiChat from "components/VAiChat.vue";
 import VInteractiveTree from "components/VInteractiveTree.vue";
 import VMilkdownEditor from "components/VMilkdownEditor.vue";
@@ -77,12 +77,11 @@ import { computed, ref, toRefs, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
-  apiKey = useStorage("apiKey", ""),
   mainStore = useMainStore(),
   tab = ref("wysiwyg"),
+  { apiKey, selected } = storeToRefs(mainStore),
   { kvNodes, nodes, tree } = toRefs(sharedStore),
   { leftDrawer, rightDrawer } = storeToRefs(mainStore),
-  { selected } = storeToRefs(mainStore),
   { t } = useI18n(),
   { width } = useWindowSize();
 
