@@ -14,7 +14,7 @@ import * as monaco from "monaco-editor";
 import { CompletionCopilot, registerCompletion } from "monacopilot";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { immediate } from "stores/defaults";
+import { enabled, immediate } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
 
@@ -26,7 +26,6 @@ const $q = useQuasar(),
   ambiguousCharacters = false,
   apiKey = useStorage("apiKey", ""),
   automaticLayout = true,
-  enabled = true,
   bracketPairColorization = { enabled },
   detectIndentation = false,
   endColumn = 1,
