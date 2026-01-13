@@ -29,7 +29,6 @@ q-btn-dropdown.q-mr-xs(auto-close, dropdown-icon="apps", flat, square, stretch)
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
 import VFaviconDialog from "components/dialogs/VFaviconDialog.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
@@ -39,9 +38,8 @@ import { useMainStore } from "stores/main";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
-  ai = useStorage("apiKey", ""),
   mainStore = useMainStore(),
-  { domain } = storeToRefs(mainStore),
+  { apiKey, domain } = storeToRefs(mainStore),
   { getObjectText, putObject } = ioStore,
   { putPages, putSitemap } = mainStore,
   { t } = useI18n();
@@ -54,12 +52,12 @@ const clickAI = () => {
       persistent,
       prompt: {
         hint: t("paste Mistral API Key only on a trusted computer"),
-        model: ai.value,
+        model: apiKey.value,
         type: "password",
       },
       title: "Mistral API Key",
     }).onOk((data: string) => {
-      ai.value = data;
+      apiKey.value = data;
     });
   },
   clickDomain = () => {
