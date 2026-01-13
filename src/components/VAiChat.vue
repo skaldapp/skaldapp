@@ -34,7 +34,6 @@ import type { ComponentPublicInstance } from "vue";
 
 import { createMistral } from "@ai-sdk/mistral";
 import { Chat } from "@ai-sdk/vue";
-import { useStorage } from "@vueuse/core";
 import { convertToModelMessages, streamText } from "ai";
 import abbreviation from "markdown-it-abbr";
 import deflist from "markdown-it-deflist";
@@ -45,7 +44,9 @@ import mark from "markdown-it-mark";
 import subscript from "markdown-it-sub";
 import superscript from "markdown-it-sup";
 import taskLists from "markdown-it-task-lists";
+import { storeToRefs } from "pinia";
 import { immediate } from "stores/defaults";
+import { useMainStore } from "stores/main";
 import { nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -74,11 +75,11 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
   }
 }
 
-const apiKey = useStorage("apiKey", ""),
-  block = "end",
+const block = "end",
   transport = new CustomChatTransport(),
   chat = new Chat({ transport }),
   chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
+  mainStore = useMainStore(),
   message = ref(""),
   plugins = [
     abbreviation,
@@ -95,6 +96,7 @@ const apiKey = useStorage("apiKey", ""),
     void chat.sendMessage({ text: message.value });
     message.value = "";
   },
+  { apiKey } = storeToRefs(mainStore),
   { t } = useI18n();
 
 watch(
