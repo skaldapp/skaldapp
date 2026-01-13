@@ -1,5 +1,10 @@
 import { defineStore } from "#q-app/wrappers";
+import { Base64, Utf8 } from "crypto-es";
 import { createPinia } from "pinia";
+import { storePlugin } from "pinia-plugin-store";
+
+const decrypt = (value: string): string => Base64.parse(value).toString(Utf8),
+  encrypt = (value: string): string => Base64.stringify(Utf8.parse(value));
 
 /*
  * When adding new properties to stores, you should also
@@ -24,9 +29,6 @@ declare module "pinia" {
 
 export default defineStore((/* { ssrContext } */) => {
   const pinia = createPinia();
-
-  // You can add Pinia plugins here
-  // pinia.use(SomePiniaPlugin)
-
+  pinia.use(storePlugin({ decrypt, encrypt, stores: ["main"] }));
   return pinia;
 });
