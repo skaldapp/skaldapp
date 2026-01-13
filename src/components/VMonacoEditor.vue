@@ -8,7 +8,6 @@ import type {
   CompletionRequestBody,
 } from "monacopilot";
 
-import { useStorage } from "@vueuse/core";
 import { split } from "hexo-front-matter";
 import * as monaco from "monaco-editor";
 import { CompletionCopilot, registerCompletion } from "monacopilot";
@@ -24,7 +23,6 @@ let completion: CompletionRegistration | null = null,
 
 const $q = useQuasar(),
   ambiguousCharacters = false,
-  apiKey = useStorage("apiKey", ""),
   automaticLayout = true,
   bracketPairColorization = { enabled },
   detectIndentation = false,
@@ -43,8 +41,8 @@ const $q = useQuasar(),
   tabSize = 2,
   technologies = ["vue", "tailwindcss", "markdown"],
   unicodeHighlight = { ambiguousCharacters },
-  { getModel } = mainStore,
-  { message, selected } = storeToRefs(mainStore);
+  { apiKey, message, selected } = storeToRefs(mainStore),
+  { getModel } = mainStore;
 
 const frontmatter = (message: string) => {
     if (message && model) {
