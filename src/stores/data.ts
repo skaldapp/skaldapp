@@ -49,7 +49,7 @@ const parseFrontmatter = (id: string) => {
   return "";
 };
 
-export const useMainStore = defineStore("skald", () => {
+export const useDataStore = defineStore("data", () => {
   const apiKey = ref(""),
     domain = ref(""),
     leftDrawer = ref(false),
@@ -188,4 +188,4 @@ ${headTags}
 });
 
 if (import.meta.hot)
-  import.meta.hot.accept(acceptHMRUpdate(useMainStore, import.meta.hot));
+  import.meta.hot.accept(acceptHMRUpdate(useDataStore, import.meta.hot));
