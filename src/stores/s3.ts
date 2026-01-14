@@ -9,35 +9,30 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { sharedStore } from "@skaldapp/shared";
 import { FetchHttpHandler } from "@smithy/fetch-http-handler";
-import { useStorage } from "@vueuse/core";
 import { AES, Utf8 } from "crypto-es";
-import { mergeDefaults } from "stores/defaults";
+import { storeToRefs } from "pinia";
+import { useMainStore } from "stores/main";
 
 let s3Client: S3Client | undefined;
 
-const { credentials: defaults } = sharedStore;
-const credential = useStorage("s3", defaults, localStorage, {
-    mergeDefaults,
-  }),
-  getObject = async (
-    Bucket: string,
-    Key: string,
-    ResponseCacheControl?: string,
-  ) => {
-    if (s3Client)
-      try {
-        const { Body, ContentType } = await s3Client.send(
-          new GetObjectCommand({ Bucket, Key, ResponseCacheControl }),
-        );
-        const headers = new Headers({ "content-type": ContentType ?? "" });
-        return new Response(Body as BodyInit, { headers });
-      } catch {
-        return new Response();
-      }
-    return new Response();
-  };
+const getObject = async (
+  Bucket: string,
+  Key: string,
+  ResponseCacheControl?: string,
+) => {
+  if (s3Client)
+    try {
+      const { Body, ContentType } = await s3Client.send(
+        new GetObjectCommand({ Bucket, Key, ResponseCacheControl }),
+      );
+      const headers = new Headers({ "content-type": ContentType ?? "" });
+      return new Response(Body as BodyInit, { headers });
+    } catch {
+      return new Response();
+    }
+  return new Response();
+};
 
 export const setS3Client = (value?: S3Client) => {
   s3Client?.destroy();
@@ -57,6 +52,7 @@ export const deleteObject = async (Bucket: string, Key: string) => {
     ResponseCacheControl?: string,
   ) => (await getObject(Bucket, Key, ResponseCacheControl)).text(),
   headBucket = async (Bucket: string, pin: string | undefined) => {
+    const { credential } = storeToRefs(useMainStore());
     let { accessKeyId, endpoint, region, secretAccessKey } =
       credential.value[Bucket] ?? {};
     if (pin) {
