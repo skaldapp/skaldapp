@@ -34,12 +34,13 @@ import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cache, cancel, persistent } from "stores/defaults";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
+  ioStore = useIoStore(),
   mainStore = useMainStore(),
   { apiKey } = storeToRefs(mainStore),
   { domain } = storeToRefs(dataStore),
