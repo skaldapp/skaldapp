@@ -41,7 +41,7 @@ q-dialog(ref="dialogRef", @hide="onDialogHide")
         hide-selected,
         hint="",
         label="endpoint url",
-        :options="endpointOptions",
+        :options,
         type="url",
         use-input,
         @input-value="(value: string) => { endpoint = value; }"
@@ -73,21 +73,16 @@ q-dialog(ref="dialogRef", @hide="onDialogHide")
 </template>
 
 <script setup lang="ts">
+import type { TCredential } from "@skaldapp/shared";
 import type { QInput } from "quasar";
 
-import { sharedStore } from "@skaldapp/shared";
-import { useStorage } from "@vueuse/core";
-import endpoints from "assets/endpoints.json";
+import options from "assets/endpoints.json";
 import regions from "assets/regions.json";
 import { AES, Utf8 } from "crypto-es";
+import { storeToRefs } from "pinia";
 import { useDialogPluginComponent, useQuasar } from "quasar";
-import {
-  configurable,
-  enumerable,
-  mergeDefaults,
-  writable,
-} from "stores/defaults";
-import { ref, toRef, triggerRef, useTemplateRef } from "vue";
+import { useMainStore } from "stores/main";
+import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { model = "", pin = null } = defineProps<{
@@ -95,57 +90,49 @@ const { model = "", pin = null } = defineProps<{
   pin?: string;
 }>();
 
-const { dialogRef, onDialogCancel, onDialogHide, onDialogOK } =
+const bucketRef = useTemplateRef<QInput>("bucketRef"),
+  isPwd = ref(true),
+  mainStore = useMainStore(),
+  { credential } = storeToRefs(mainStore),
+  { dialogRef, onDialogCancel, onDialogHide, onDialogOK } =
     useDialogPluginComponent(),
   { t } = useI18n();
 
 const $q = useQuasar(),
-  defaultCredentials = toRef(sharedStore, "credentials"),
-  credential = useStorage("s3", defaultCredentials, localStorage, {
-    mergeDefaults,
-  }),
   decrypt = (value?: string) =>
     pin ? AES.decrypt(value ?? "", pin).toString(Utf8) : (value ?? null),
   accessKeyId = ref(decrypt(credential.value[model]?.accessKeyId ?? undefined)),
-  Bucket = $ref(decrypt(credential.value[model]?.Bucket ?? undefined)),
-  bucketRef = useTemplateRef<QInput>("bucketRef"),
-  click = (value: Record<string, null | string>) => {
-    if (Bucket)
-      if (model !== Bucket && Reflect.has(credential.value, Bucket))
+  Bucket = ref(decrypt(credential.value[model]?.Bucket ?? undefined)),
+  endpoint = ref(decrypt(credential.value[model]?.endpoint ?? undefined)),
+  region = ref(decrypt(credential.value[model]?.region ?? undefined)),
+  secretAccessKey = ref(
+    decrypt(credential.value[model]?.secretAccessKey ?? undefined),
+  );
+
+const click = (value: TCredential) => {
+    if (Bucket.value)
+      if (model !== Bucket.value && Reflect.has(credential.value, Bucket.value))
         $q.dialog({
           message: t("That account already exists"),
           title: t("Confirm"),
         });
       else {
-        if (model && model !== Bucket)
+        if (model && model !== Bucket.value)
           Reflect.deleteProperty(credential.value, model);
-        Reflect.defineProperty(credential.value, Bucket, {
-          configurable,
-          enumerable,
-          value,
-          writable,
-        });
-        triggerRef(credential);
+        credential.value[Bucket.value] = value;
         onDialogOK();
       }
   },
-  encrypt = (obj: Record<string, null | string>) =>
-    pin
+  encrypt = (obj: TCredential) =>
+    (pin
       ? Object.fromEntries(
           Object.entries(obj).map(([key, value]) => [
             key,
             AES.encrypt(value ?? "", pin).toString(),
           ]),
         )
-      : obj,
-  endpoint = ref(decrypt(credential.value[model]?.endpoint ?? undefined)),
-  endpointOptions = ref(endpoints),
-  getRegions = (value: null | string) => regions[(value ?? "") as keyof object],
-  isPwd = ref(true),
-  region = ref(decrypt(credential.value[model]?.region ?? undefined)),
-  secretAccessKey = ref(
-    decrypt(credential.value[model]?.secretAccessKey ?? undefined),
-  );
+      : obj) as TCredential,
+  getRegions = (value: null | string) => regions[(value ?? "") as keyof object];
 
 defineEmits(useDialogPluginComponent.emits);
 </script>
