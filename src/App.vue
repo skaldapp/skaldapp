@@ -9,10 +9,11 @@ import { editor } from "monaco-editor";
 import { storeToRefs } from "pinia";
 import { useDataStore } from "stores/data";
 import { cache, writable } from "stores/defaults";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { toRefs, watch } from "vue";
 
 const dataStore = useDataStore(),
+  ioStore = useIoStore(),
   { bucket } = toRefs(ioStore),
   { data: manifest } = useFetch("runtime/.vite/manifest.json").json<
     Record<string, Record<string, string>>
