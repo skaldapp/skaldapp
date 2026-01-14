@@ -26,6 +26,7 @@ import { generateText } from "ai";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { debounce, Lang, useQuasar } from "quasar";
+import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent, second } from "stores/defaults";
 import highlighter from "stores/highlighter";
 import { ioStore } from "stores/io";
@@ -35,6 +36,7 @@ import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
   dark = "nord",
+  dataStore = useDataStore(),
   deco = DecorationSet.empty,
   key = new PluginKey("MilkdownCopilot"),
   lang = "mdc",
@@ -83,7 +85,7 @@ Output: "This approach yielded statistically significant results across all expe
   yaml = "---",
   { apiKey, selected } = storeToRefs(mainStore),
   { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
-  { getModel } = mainStore,
+  { getModel } = dataStore,
   { getObjectBlob, headObject, putObject } = ioStore,
   { t } = useI18n();
 
