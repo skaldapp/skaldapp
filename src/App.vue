@@ -4,19 +4,23 @@ router-view
 
 <script setup lang="ts">
 import { sharedStore } from "@skaldapp/shared";
+import { useFetch } from "@vueuse/core";
 import { editor } from "monaco-editor";
 import { storeToRefs } from "pinia";
+import { useDataStore } from "stores/data";
 import { cache, writable } from "stores/defaults";
 import { ioStore } from "stores/io";
-import { useMainStore } from "stores/main";
 import { toRef, toRefs, watch } from "vue";
 
 const bucket = toRef(ioStore, "bucket"),
-  mainStore = useMainStore(),
+  dataStore = useDataStore(),
+  { data: manifest } = useFetch("runtime/.vite/manifest.json").json<
+    Record<string, Record<string, string>>
+  >(),
   { deleteObject, getObjectText, headObject, putObject } = ioStore,
-  { domain } = storeToRefs(mainStore),
-  { manifest, putPages } = mainStore,
-  { nodes, tree } = toRefs(sharedStore);
+  { domain } = storeToRefs(dataStore),
+  { nodes, tree } = toRefs(sharedStore),
+  { putPages } = dataStore;
 
 watch(nodes, (value) => {
   value.forEach((object) => {
