@@ -9,7 +9,7 @@ import { editor, Uri } from "monaco-editor";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { debounce } from "quasar";
 import { cache, second } from "stores/defaults";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import {
   AliasSortingPlugin,
   CanonicalPlugin,
@@ -21,34 +21,37 @@ export type TAppPage = TPage & {
   contenteditable: boolean;
 };
 
-const oldPages: string[] = [],
-  { data: body } = useFetch(`runtime/index.html`).text(),
-  { deleteObject, getObjectText, putObject, removeEmptyDirectories } = ioStore,
-  { kvNodes, nodes } = toRefs(sharedStore);
-
-const parseFrontmatter = (id: string) => {
-  const model = editor.getModel(Uri.parse(`file:///${id}.md`));
-  if (model && kvNodes.value[id])
-    try {
-      const frontmatter = parse(model.getValue());
-      delete frontmatter._content;
-      if (
-        JSON.stringify(kvNodes.value[id].frontmatter) !==
-        JSON.stringify(frontmatter)
-      )
-        kvNodes.value[id].frontmatter = frontmatter;
-    } catch (error) {
-      const { message } = error as Error;
-      if (JSON.stringify(kvNodes.value[id].frontmatter) !== JSON.stringify({}))
-        kvNodes.value[id].frontmatter = {};
-      return message;
-    }
-  return "";
-};
-
 export const useDataStore = defineStore("data", () => {
   const domain = ref(""),
-    message = ref("");
+    ioStore = useIoStore(),
+    message = ref(""),
+    oldPages: string[] = [],
+    { data: body } = useFetch(`runtime/index.html`).text(),
+    { deleteObject, getObjectText, putObject, removeEmptyDirectories } =
+      ioStore,
+    { kvNodes, nodes } = toRefs(sharedStore);
+
+  const parseFrontmatter = (id: string) => {
+    const model = editor.getModel(Uri.parse(`file:///${id}.md`));
+    if (model && kvNodes.value[id])
+      try {
+        const frontmatter = parse(model.getValue());
+        delete frontmatter._content;
+        if (
+          JSON.stringify(kvNodes.value[id].frontmatter) !==
+          JSON.stringify(frontmatter)
+        )
+          kvNodes.value[id].frontmatter = frontmatter;
+      } catch (error) {
+        const { message } = error as Error;
+        if (
+          JSON.stringify(kvNodes.value[id].frontmatter) !== JSON.stringify({})
+        )
+          kvNodes.value[id].frontmatter = {};
+        return message;
+      }
+    return "";
+  };
 
   const getModel = async (id: string) => {
       const uri = Uri.parse(`file:///${id}.md`);
