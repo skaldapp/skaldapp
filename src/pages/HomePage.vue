@@ -69,8 +69,8 @@ q-page.column.no-scroll
       .text-overline {{ t("ver") }}.: {{ APP_VERSION }}
 </template>
 <script setup lang="ts">
-import { sharedStore } from "@skaldapp/shared";
-import { useStorage } from "@vueuse/core";
+import type { TCredential } from "@skaldapp/shared";
+
 import VCredsDialog from "components/dialogs/VCredsDialog.vue";
 import VOtpDialog from "components/dialogs/VOtpDialog.vue";
 import { AES, Utf8 } from "crypto-es";
@@ -78,23 +78,19 @@ import ContentPage from "pages/ContentPage.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import MainLayout from "src/layouts/MainLayout.vue";
-import { mergeDefaults, persistent } from "stores/defaults";
+import { persistent } from "stores/defaults";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
-import { toRef, triggerRef } from "vue";
+import { triggerRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
 const $q = useQuasar(),
   APP_VERSION = __APP_VERSION__,
-  defaultCredentials = toRef(sharedStore, "credentials"),
-  credential = useStorage("s3", defaultCredentials, localStorage, {
-    mergeDefaults,
-  }),
   mainStore = useMainStore(),
   router = useRouter(),
+  { credential, rightDrawer } = storeToRefs(mainStore),
   { headBucket, setFileSystemDirectoryHandle } = ioStore,
-  { rightDrawer } = storeToRefs(mainStore),
   { t } = useI18n();
 
 const add = () => {
@@ -162,15 +158,15 @@ const add = () => {
       if (cred)
         if (name === cred.Bucket) {
           Object.keys(cred).forEach((key) => {
-            cred[key] = AES.encrypt(
-              (cred[key] ?? "") as string,
+            cred[key as keyof TCredential] = AES.encrypt(
+              cred[key as keyof TCredential] ?? "",
               payload,
             ).toString();
           });
         } else {
           Object.keys(cred).forEach((key) => {
-            cred[key] = AES.decrypt(
-              (cred[key] ?? "") as string,
+            cred[key as keyof TCredential] = AES.decrypt(
+              cred[key as keyof TCredential] ?? "",
               payload,
             ).toString(Utf8);
           });
