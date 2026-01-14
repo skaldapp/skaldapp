@@ -109,7 +109,7 @@ const add = () => {
       component: MainLayout,
       path,
     });
-    router.push(path).catch(console.error);
+    void router.push(path);
   },
   getDir = async () => {
     if ($q.platform.is.electron) {
