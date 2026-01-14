@@ -23,9 +23,6 @@ export type TAppPage = TPage & {
 
 const oldPages: string[] = [],
   { data: body } = useFetch(`runtime/index.html`).text(),
-  { data: manifest } = useFetch("runtime/.vite/manifest.json").json<
-    Record<string, Record<string, string>>
-  >(),
   { deleteObject, getObjectText, putObject, removeEmptyDirectories } = ioStore,
   { kvNodes, nodes } = toRefs(sharedStore);
 
@@ -50,12 +47,8 @@ const parseFrontmatter = (id: string) => {
 };
 
 export const useDataStore = defineStore("data", () => {
-  const apiKey = ref(""),
-    domain = ref(""),
-    leftDrawer = ref(false),
-    message = ref(""),
-    rightDrawer = ref(false),
-    selected = ref("");
+  const domain = ref(""),
+    message = ref("");
 
   const getModel = async (id: string) => {
       const uri = Uri.parse(`file:///${id}.md`);
@@ -173,17 +166,11 @@ ${headTags}
     };
 
   return {
-    apiKey,
-    body,
     domain,
     getModel,
-    leftDrawer,
-    manifest,
     message,
     putPages,
     putSitemap,
-    rightDrawer,
-    selected,
   };
 });
 
