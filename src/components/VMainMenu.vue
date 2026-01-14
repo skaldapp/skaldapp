@@ -76,9 +76,9 @@ const clickAI = () => {
       title: t("Domain"),
     }).onOk((value: string) => {
       domain.value = value;
-      putObject("CNAME", domain.value, "text/plain").catch(console.error);
-      putSitemap().catch(console.error);
-      putPages().catch(console.error);
+      void putObject("CNAME", domain.value, "text/plain");
+      void putSitemap();
+      void putPages();
     });
   },
   clickRobots = async () => {
@@ -92,7 +92,7 @@ const clickAI = () => {
       prompt: { model: await getObjectText(title, cache), type: "textarea" },
       title,
     }).onOk((data: string) => {
-      putObject(title, data, "text/plain").catch(console.error);
+      void putObject(title, data, "text/plain");
     });
   };
 </script>
