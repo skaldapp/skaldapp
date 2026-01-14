@@ -13,6 +13,7 @@ import * as monaco from "monaco-editor";
 import { CompletionCopilot, registerCompletion } from "monacopilot";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
+import { useDataStore } from "stores/data";
 import { enabled, immediate } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
@@ -25,6 +26,7 @@ const $q = useQuasar(),
   ambiguousCharacters = false,
   automaticLayout = true,
   bracketPairColorization = { enabled },
+  dataStore = useDataStore(),
   detectIndentation = false,
   endColumn = 1,
   fixedOverflowWidgets = true,
@@ -41,8 +43,9 @@ const $q = useQuasar(),
   tabSize = 2,
   technologies = ["vue", "tailwindcss", "markdown"],
   unicodeHighlight = { ambiguousCharacters },
-  { apiKey, message, selected } = storeToRefs(mainStore),
-  { getModel } = mainStore;
+  { apiKey, selected } = storeToRefs(mainStore),
+  { getModel } = dataStore,
+  { message } = storeToRefs(dataStore);
 
 const frontmatter = (message: string) => {
     if (message && model) {
