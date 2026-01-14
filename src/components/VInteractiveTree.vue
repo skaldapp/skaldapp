@@ -212,13 +212,13 @@ watch(
 watch(
   nodes,
   debounce((value) => {
-    putObject(
+    void putObject(
       "index.json",
       JSON.stringify([value[0]]),
       "application/json",
-    ).catch(console.error);
-    putSitemap().catch(console.error);
-    putPages().catch(console.error);
+    );
+    void putSitemap();
+    void putPages();
   }, second),
   { deep },
 );
