@@ -27,8 +27,9 @@ import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { debounce, Lang, useQuasar } from "quasar";
 import { cancel, immediate, persistent, second } from "stores/defaults";
+import highlighter from "stores/highlighter";
 import { ioStore } from "stores/io";
-import { highlighter, useMainStore } from "stores/main";
+import { useMainStore } from "stores/main";
 import { onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
