@@ -29,7 +29,7 @@ import { debounce, Lang, useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent, second } from "stores/defaults";
 import highlighter from "stores/highlighter";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -38,6 +38,7 @@ const $q = useQuasar(),
   dark = "nord",
   dataStore = useDataStore(),
   deco = DecorationSet.empty,
+  ioStore = useIoStore(),
   key = new PluginKey("MilkdownCopilot"),
   lang = "mdc",
   light = "github-light-default",
