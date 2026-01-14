@@ -3,11 +3,11 @@ import { sharedStore } from "@skaldapp/shared";
 import routes from "src/router/routes";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
-import { toRef } from "vue";
+import { toRefs } from "vue";
 
 const [route] = routes,
   mainStore = useMainStore(),
-  tree = toRef(sharedStore, "tree");
+  { tree } = toRefs(sharedStore);
 
 export default defineBoot(({ router }) => {
   router.beforeEach(({ path }, _from, next) => {
