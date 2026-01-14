@@ -6,7 +6,7 @@ import * as monaco from "monaco-editor";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { configureMonacoTailwindcss } from "monaco-tailwind";
 import TailwindWorker from "monaco-tailwind/tailwind.worker?worker";
-import { highlighter } from "stores/main";
+import highlighter from "stores/highlighter";
 
 const languageSelector = ["markdown"];
 
