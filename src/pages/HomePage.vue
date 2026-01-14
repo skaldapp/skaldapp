@@ -79,7 +79,7 @@ import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import MainLayout from "src/layouts/MainLayout.vue";
 import { persistent } from "stores/defaults";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { triggerRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -87,6 +87,7 @@ import { useRouter } from "vue-router";
 
 const $q = useQuasar(),
   APP_VERSION = __APP_VERSION__,
+  ioStore = useIoStore(),
   mainStore = useMainStore(),
   router = useRouter(),
   { credential, rightDrawer } = storeToRefs(mainStore),
@@ -123,9 +124,8 @@ const add = () => {
         setFileSystemDirectoryHandle(dirHandle);
         const { name } = dirHandle;
         directLogin(name);
-      } catch (err) {
-        const { message } = err as Error;
-        $q.notify({ message });
+      } catch {
+        //
       }
   },
   getPin = async (name: string): Promise<string | undefined> =>
