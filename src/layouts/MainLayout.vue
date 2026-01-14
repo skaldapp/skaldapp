@@ -44,11 +44,12 @@ q-layout(view="hHh LpR lff")
 import VMainMenu from "components/VMainMenu.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { toRefs, watch } from "vue";
 
 const $q = useQuasar(),
+  ioStore = useIoStore(),
   mainStore = useMainStore(),
   { bucket } = toRefs(ioStore),
   { leftDrawer, rightDrawer } = storeToRefs(mainStore);
