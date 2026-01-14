@@ -46,11 +46,11 @@ import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
-import { toRef, watch } from "vue";
+import { toRefs, watch } from "vue";
 
 const $q = useQuasar(),
-  bucket = toRef(ioStore, "bucket"),
   mainStore = useMainStore(),
+  { bucket } = toRefs(ioStore),
   { leftDrawer, rightDrawer } = storeToRefs(mainStore);
 
 watch(
