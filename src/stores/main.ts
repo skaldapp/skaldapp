@@ -1,18 +1,15 @@
+import type { TCredential } from "@skaldapp/shared";
+
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { ref } from "vue";
 
-export const useMainStore = defineStore("skald", () => {
-  const apiKey = ref(""),
-    leftDrawer = ref(false),
-    rightDrawer = ref(false),
-    selected = ref("");
-
-  return {
-    apiKey,
-    leftDrawer,
-    rightDrawer,
-    selected,
-  };
+export const useMainStore = defineStore("skald", {
+  state: () => ({
+    apiKey: "",
+    credential: {} as Record<string, TCredential>,
+    leftDrawer: false,
+    rightDrawer: false,
+    selected: "",
+  }),
 });
 
 if (import.meta.hot)
