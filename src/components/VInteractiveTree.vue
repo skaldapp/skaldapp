@@ -73,6 +73,7 @@ import { Icon } from "@iconify/vue";
 import { sharedStore } from "@skaldapp/shared";
 import { storeToRefs } from "pinia";
 import { debounce, useQuasar } from "quasar";
+import { useDataStore } from "stores/data";
 import { cancel, deep, immediate, persistent, second } from "stores/defaults";
 import { ioStore } from "stores/io";
 import { useMainStore } from "stores/main";
@@ -80,6 +81,7 @@ import { ref, toRefs, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
+  dataStore = useDataStore(),
   mainStore = useMainStore(),
   qtree = useTemplateRef<QTree>("qtree"),
   state = ref(false),
@@ -87,7 +89,7 @@ const $q = useQuasar(),
   { add, addChild, down, left, remove, right, up } = sharedStore,
   { deleteObject, putObject } = ioStore,
   { kvNodes, nodes } = toRefs(sharedStore),
-  { putPages, putSitemap } = mainStore,
+  { putPages, putSitemap } = dataStore,
   { selected } = storeToRefs(mainStore),
   { t } = useI18n();
 
