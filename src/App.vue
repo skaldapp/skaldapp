@@ -68,7 +68,7 @@ watch(bucket, async (value) => {
       [...serverManifest]
         .filter((x) => !localManifest.has(x))
         .forEach((element) => {
-          deleteObject(element).catch(console.error);
+          void deleteObject(element);
         });
 
       await Promise.allSettled(
@@ -84,7 +84,7 @@ watch(bucket, async (value) => {
           }),
       );
 
-      putPages().catch(console.error);
+      void putPages();
     }
   } else {
     tree.value.length = 0;
