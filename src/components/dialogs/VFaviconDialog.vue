@@ -18,11 +18,12 @@ q-dialog(ref="dialogRef", @hide="onDialogHide")
 import type { QUploader } from "quasar";
 
 import { useDialogPluginComponent, useQuasar } from "quasar";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
+  ioStore = useIoStore(),
   uploader = useTemplateRef<QUploader>("uploader"),
   { dialogRef, onDialogHide } = useDialogPluginComponent(),
   { putObject } = ioStore,
