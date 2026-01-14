@@ -60,7 +60,7 @@ q-page.column.full-height.bg-light(v-else)
 </template>
 <script setup lang="ts">
 import type { TouchPanValue } from "quasar";
-import type { TAppPage } from "stores/main";
+import type { TAppPage } from "stores/data";
 
 import { MilkdownProvider } from "@milkdown/vue";
 import { sharedStore } from "@skaldapp/shared";
