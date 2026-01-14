@@ -75,13 +75,14 @@ import { storeToRefs } from "pinia";
 import { debounce, useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cancel, deep, immediate, persistent, second } from "stores/defaults";
-import { ioStore } from "stores/io";
+import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { ref, toRefs, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
+  ioStore = useIoStore(),
   mainStore = useMainStore(),
   qtree = useTemplateRef<QTree>("qtree"),
   state = ref(false),
