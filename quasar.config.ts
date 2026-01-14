@@ -58,7 +58,6 @@ export default defineConfig(() => ({
     vitePlugins: [
       ["@intlify/unplugin-vue-i18n/vite", { include }],
       ["vite-plugin-checker", { eslint, vueTsc }, { server }],
-      ["@vue-macros/reactivity-transform/vite"],
     ],
   },
   css,
