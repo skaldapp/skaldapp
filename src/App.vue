@@ -10,10 +10,10 @@ import { storeToRefs } from "pinia";
 import { useDataStore } from "stores/data";
 import { cache, writable } from "stores/defaults";
 import { ioStore } from "stores/io";
-import { toRef, toRefs, watch } from "vue";
+import { toRefs, watch } from "vue";
 
-const bucket = toRef(ioStore, "bucket"),
-  dataStore = useDataStore(),
+const dataStore = useDataStore(),
+  { bucket } = toRefs(ioStore),
   { data: manifest } = useFetch("runtime/.vite/manifest.json").json<
     Record<string, Record<string, string>>
   >(),
