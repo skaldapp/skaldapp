@@ -45,7 +45,7 @@ watch(bucket, async (value) => {
 
     const [cname = ""] = getCname?.split("\n", 1) ?? [],
       [localManifest, serverManifest] = (
-        [manifest, JSON.parse(getManifest ?? "{}")] as Record<
+        [manifest.value, JSON.parse(getManifest ?? "{}")] as Record<
           string,
           Record<string, string[]> | undefined
         >[]
