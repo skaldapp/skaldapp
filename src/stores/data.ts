@@ -74,7 +74,6 @@ attrs:
     - container
     - mx-auto
     - prose
-    - max-w-none
 flat: false
 hidden: false
 template: false
