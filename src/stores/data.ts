@@ -74,7 +74,6 @@ attrs:
     - container
     - mx-auto
     - prose
-flat: false
 hidden: false
 template: false
 icon: twemoji:page-facing-up
@@ -155,7 +154,7 @@ ${headTags}
     putSitemap = async () => {
       await putObject(
         "sitemap.txt",
-        (nodes.value as TPage[])
+        nodes.value
           .map(({ frontmatter: { hidden }, to }) =>
             domain.value && to && !hidden
               ? `https://${domain.value}${to === "/" ? "" : encodeURI(to)}`
