@@ -59,7 +59,6 @@ q-page-sticky(:offset="[15, 15]", position="bottom-right")
               :icon="prop.node.frontmatter.icon"
             )
           template(#append)
-            q-icon(v-if="prop.node.frontmatter.flat", name="account_tree")
             q-icon(
               v-if="prop.node.frontmatter.template",
               name="picture_in_picture_alt"
@@ -100,8 +99,8 @@ const errors = [
       !!nodes.value.find(
         (element) =>
           propNode.path &&
-          ((element.id !== propNode.id && element.path === propNode.path) ||
-            element.loc === propNode.path),
+          element.id !== propNode.id &&
+          element.path === propNode.path,
       ),
     (propNode: TPage) =>
       ["?", "\\", "#"].some((value) => propNode.name?.includes(value)),
