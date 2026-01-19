@@ -111,7 +111,7 @@ const cleaner = (value: TPage[]) => {
     value.forEach((page) => {
       const { children, id } = page;
       if (children.length) cleaner(children as TPage[]);
-      if (id) void deleteObject(`pages/${id}.md`);
+      if (id) void deleteObject(`docs/${id}.md`);
     });
   },
   clickAdd = () => {
@@ -215,7 +215,7 @@ watch(
   nodes,
   debounce((value) => {
     void putObject(
-      "index.json",
+      "docs/index.json",
       JSON.stringify([value[0]]),
       "application/json",
     );
