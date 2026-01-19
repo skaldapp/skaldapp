@@ -37,7 +37,7 @@ watch(bucket, async (value) => {
   if (value) {
     const [getIndex, getManifest, getCname] = (
       await Promise.all(
-        ["index.json", ".vite/manifest.json", "CNAME"].map((file) =>
+        ["docs/index.json", ".vite/manifest.json", "CNAME"].map((file) =>
           getObjectText(file, cache),
         ),
       )
