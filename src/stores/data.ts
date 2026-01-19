@@ -128,7 +128,8 @@ icon: twemoji:page-facing-up
                       .join("/") || "./",
                 },
               });
-            else if (frontmatter.template) vueHeadClient.push(frontmatter);
+            else if (frontmatter.template && !frontmatter.hidden)
+              vueHeadClient.push(frontmatter);
           });
           void (async () => {
             if (body.value)
