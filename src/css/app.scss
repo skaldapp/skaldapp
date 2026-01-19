@@ -26,18 +26,13 @@ img.emoji {
   color: $nord6;
 }
 
-.body--light a {
-  color: $nord10;
-  text-decoration: none;
-}
-
-.body--dark a {
-  color: $nord8;
+a {
+  color: $nord9;
   text-decoration: none;
 }
 
 a:hover {
-  color: $nord9;
+  color: $nord10;
 }
 
 .body--light .q-header {
