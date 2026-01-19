@@ -58,10 +58,10 @@ export const useDataStore = defineStore("data", () => {
       let model = editor.getModel(uri);
       const putObjectDebounced = debounce(() => {
         if (model)
-          void putObject(`pages/${id}.md`, model.getValue(), "text/markdown");
+          void putObject(`docs/${id}.md`, model.getValue(), "text/markdown");
       }, second);
       if (!model) {
-        const value = await getObjectText(`pages/${id}.md`, cache);
+        const value = await getObjectText(`docs/${id}.md`, cache);
         model = editor.createModel(
           value ||
             `---
