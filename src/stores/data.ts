@@ -70,6 +70,7 @@ meta:
   - name: description
     content: Description
 attrs:
+  un-cloak: true
   class:
     - container
     - mx-auto

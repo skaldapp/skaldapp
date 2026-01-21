@@ -155,21 +155,17 @@ ${markdown}`
         htmlSchema.extendSchema((prev) => (ctx) => ({
           ...prev(ctx),
           toDOM: (node) => {
-            const div = document.createElement("div");
-            div.innerHTML = highlighter.codeToHtml(node.attrs.value, {
+            const span = document.createElement("span");
+            const attr = {
+              ...ctx.get(htmlAttr.key)(node),
+              "data-type": "html",
+              "data-value": node.attrs.value,
+            };
+            span.innerHTML = highlighter.codeToHtml(node.attrs.value, {
               lang,
               themes,
             });
-            div.classList = "rounded-borders q-card--bordered";
-            return [
-              "span",
-              {
-                ...ctx.get(htmlAttr.key)(node),
-                "data-type": "html",
-                "data-value": node.attrs.value,
-              },
-              div,
-            ];
+            return ["span", attr, span.firstElementChild];
           },
         })),
       )
