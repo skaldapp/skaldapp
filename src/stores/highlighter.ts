@@ -6,8 +6,15 @@ import { createHighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 import options from "shiki/wasm";
 
+const engine = createOnigurumaEngine(options),
+  markdown = "mdc",
+  langAlias = { markdown },
+  langs = [vue, mdc],
+  themes = [lightTheme, darkTheme];
+
 export default await createHighlighterCore({
-  engine: createOnigurumaEngine(options),
-  langs: [vue, mdc],
-  themes: [lightTheme, darkTheme],
+  engine,
+  langAlias,
+  langs,
+  themes,
 });

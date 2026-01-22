@@ -80,7 +80,7 @@ template: false
 icon: twemoji:page-facing-up
 ---
 `,
-          "mdc",
+          "markdown",
           uri,
         );
         model.onDidChangeContent(() => {
