@@ -99,7 +99,7 @@ const clearUrls = () => {
   featureConfigs = {
     [Crepe.Feature.ImageBlock]: { onUpload, proxyDomURL },
   },
-  getHint = async ({ get }: Ctx, view: EditorView) => {
+  getHint = debounce(async ({ get }: Ctx, view: EditorView) => {
     const {
       dispatch,
       state: {
@@ -117,7 +117,7 @@ const clearUrls = () => {
       const { text } = await generateText({ model, prompt, system });
       dispatch(cloneTr(view.state.tr).setMeta(key, text));
     }
-  },
+  }, second),
   getValue = () => {
     const value = textModel.getValue(),
       { content, data, prefixSeparator, separator } = split(value);
@@ -184,26 +184,29 @@ ${markdown}`
 
                   dispatch(tr.setMeta(key, ""));
                   switch (event.key) {
+                    case " ":
                     case "Enter":
-                      void getHint(ctx, view);
+                      getHint(ctx, view);
                       break;
                     case "Tab":
-                      event.preventDefault();
-                      dispatch(
-                        tr.replaceSelection(
-                          DOMParser.fromSchema(schema).parseSlice(
-                            DOMSerializer.fromSchema(schema).serializeFragment(
-                              content,
+                      if (message) {
+                        event.preventDefault();
+                        dispatch(
+                          tr.replaceSelection(
+                            DOMParser.fromSchema(schema).parseSlice(
+                              DOMSerializer.fromSchema(
+                                schema,
+                              ).serializeFragment(content),
                             ),
                           ),
-                        ),
-                      );
-                      return true;
+                        );
+                        return true;
+                      } else getHint.cancel();
+                      break;
+                    default:
+                      getHint.cancel();
                   }
                 },
-                handleTextInput: debounce((view, from, to, text) => {
-                  if (text === " ") void getHint(ctx, view);
-                }, second),
               },
               state: {
                 apply(tr, value, prevState, { doc, schema }) {
