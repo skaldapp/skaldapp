@@ -4,11 +4,13 @@ import configureMonacoSFC from "@skaldapp/monaco-sfc";
 import VueWorker from "@skaldapp/monaco-sfc/vue.worker?worker";
 import * as monaco from "monaco-editor";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-import { configureMonacoTailwindcss } from "monaco-tailwind";
+import { configureMonacoTailwindcss, tailwindcssData } from "monaco-tailwind";
 import TailwindWorker from "monaco-tailwind/tailwind.worker?worker";
 import highlighter from "stores/highlighter";
 
-const languageSelector = ["markdown"];
+const dataProviders = { tailwindcssData },
+  data = { dataProviders },
+  languageSelector = ["markdown"];
 
 window.MonacoEnvironment = {
   getWorker: (workerId: string, label: string) => {
@@ -22,6 +24,8 @@ window.MonacoEnvironment = {
     }
   },
 };
+
+monaco.languages.css.cssDefaults.setOptions({ data });
 
 configureMonacoSFC(monaco);
 configureMonacoTailwindcss(monaco, { languageSelector });
