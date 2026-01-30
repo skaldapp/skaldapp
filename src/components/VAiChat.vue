@@ -17,23 +17,26 @@
       :src="part.text"
     )
 q-input.q-ma-md(
+  ref="input",
   v-model="message",
   autofocus,
   autogrow,
   class="max-h-1/3",
   input-class="max-h-full",
   :label="t('How can I help you today?')",
-  @keydown.enter.prevent="send"
+  @keydown.enter="!$event.shiftKey && ($event.preventDefault(), send())"
 )
   template(#after)
     q-btn(dense, flat, icon="send", round, @click="send")
 </template>
 <script setup lang="ts">
 import type { ChatTransport, LanguageModel, UIMessage } from "ai";
+import type { QInput } from "quasar";
 import type { ComponentPublicInstance } from "vue";
 
 import { createMistral } from "@ai-sdk/mistral";
 import { Chat } from "@ai-sdk/vue";
+import { whenever } from "@vueuse/core";
 import { convertToModelMessages, streamText } from "ai";
 import abbreviation from "markdown-it-abbr";
 import deflist from "markdown-it-deflist";
@@ -79,6 +82,7 @@ const block = "end",
   transport = new CustomChatTransport(),
   chat = new Chat({ transport }),
   chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
+  input = useTemplateRef<QInput>("input"),
   mainStore = useMainStore(),
   message = ref(""),
   plugins = [
@@ -93,10 +97,12 @@ const block = "end",
     taskLists,
   ],
   send = () => {
-    void chat.sendMessage({ text: message.value });
-    message.value = "";
+    if (["error", "ready"].includes(chat.status)) {
+      void chat.sendMessage({ text: message.value });
+      message.value = "";
+    }
   },
-  { apiKey } = storeToRefs(mainStore),
+  { apiKey, rightDrawer } = storeToRefs(mainStore),
   { t } = useI18n();
 
 watch(
@@ -120,6 +126,10 @@ watch(
     });
   },
 );
+
+whenever(rightDrawer, () => {
+  input.value?.focus();
+});
 </script>
 
 <style scoped>
