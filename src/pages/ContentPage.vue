@@ -4,8 +4,7 @@ q-drawer(
   behavior="desktop",
   overlay,
   side="right",
-  :width="rightDrawerWidth",
-  @keyup.esc="rightDrawer = false"
+  :width="rightDrawerWidth"
 )
   .column.fit.no-wrap(v-if="apiKey")
     v-ai-chat

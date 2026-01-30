@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh LpR lff")
+q-layout(view="hHh LpR lff", @keyup.esc="rightDrawer = false")
   q-header
     q-toolbar
       q-btn(
