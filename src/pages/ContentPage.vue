@@ -41,7 +41,7 @@ q-page.column.full-height(v-if="the")
     q-tab(label="wysiwyg", name="wysiwyg")
     q-tab(label="markdown", name="md")
   q-tab-panels.full-width.col(v-if="selected", v-model="tab")
-    q-tab-panel.q-px-none.milkdown(name="wysiwyg")
+    q-tab-panel.q-px-none(name="wysiwyg")
       Suspense
         milkdown-provider
           v-milkdown-editor.full-height.scroll
