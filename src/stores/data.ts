@@ -144,12 +144,7 @@ icon: twemoji:page-facing-up
                 const { headTags } = await renderSSRHead(vueHeadClient);
                 await putObject(
                   path ? `${path}/index.html` : "index.html",
-                  body.value.replace(
-                    "<head>",
-                    `<head>
-${headTags}
-`,
-                  ),
+                  body.value.replace("{{ head }}", headTags),
                   "text/html",
                 );
               } catch (error) {
