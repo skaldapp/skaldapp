@@ -76,10 +76,7 @@ attrs:
     - mx-auto
     - prose
     - prose-sm
-    - md:prose-base
-    - lg:prose-lg
-    - xl:prose-xl
-    - 2xl:prose-2xl
+    - sm:prose-base
     - dark:prose-invert
 hidden: false
 template: false
