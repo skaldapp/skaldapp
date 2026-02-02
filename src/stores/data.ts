@@ -125,18 +125,12 @@ icon: twemoji:page-facing-up
             ],
           });
           branch.forEach(({ frontmatter }, index) => {
-            if (branch.length - 1 === index)
-              vueHeadClient.push({
-                ...frontmatter,
-                base: {
-                  href:
-                    Array(branch.length - 1)
-                      .fill("..")
-                      .join("/") || "./",
-                },
-              });
-            else if (frontmatter.template && !frontmatter.hidden)
+            if (
+              branch.length - 1 === index ||
+              (frontmatter.template && !frontmatter.hidden)
+            ) {
               vueHeadClient.push(frontmatter);
+            }
           });
           void (async () => {
             if (body.value)
@@ -144,7 +138,17 @@ icon: twemoji:page-facing-up
                 const { headTags } = await renderSSRHead(vueHeadClient);
                 await putObject(
                   path ? `${path}/index.html` : "index.html",
-                  body.value.replace("{{ head }}", headTags),
+                  body.value
+                    .replace(
+                      "<head>",
+                      `<head>
+    <base href="${
+      Array(branch.length - 1)
+        .fill("..")
+        .join("/") || "./"
+    }">`,
+                    )
+                    .replace("{{ head }}", headTags),
                   "text/html",
                 );
               } catch (error) {
