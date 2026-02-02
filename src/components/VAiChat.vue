@@ -9,7 +9,7 @@
     q-markdown(
       v-for="part in parts.filter((part) => part.type === 'text')",
       :key="part.type",
-      content-class="line-height-2 min-h-16 no-scroll",
+      content-class="line-height-2 min-h-16 no-scroll select-auto",
       no-heading-anchor-links,
       no-line-numbers,
       :plugins,
@@ -141,5 +141,8 @@ whenever(rightDrawer, () => {
 }
 :deep(.min-h-16) {
   min-height: 4rem;
+}
+:deep(.select-auto) {
+  user-select: auto;
 }
 </style>
