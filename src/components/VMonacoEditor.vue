@@ -94,7 +94,7 @@ watch(message, frontmatter);
 watch(
   () => $q.dark.isActive,
   (val) => {
-    monaco.editor.setTheme(val ? "nord" : "github-light-default");
+    monaco.editor.setTheme(val ? "vs-dark" : "vs");
   },
   { immediate },
 );

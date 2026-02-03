@@ -1,4 +1,3 @@
-import { shikiToMonaco } from "@shikijs/monaco";
 import configureMonacoSFC from "@skaldapp/monaco-sfc";
 // eslint-disable-next-line import-x/default
 import VueWorker from "@skaldapp/monaco-sfc/vue.worker?worker";
@@ -6,7 +5,6 @@ import * as monaco from "monaco-editor";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { configureMonacoTailwindcss, tailwindcssData } from "monaco-tailwind";
 import TailwindWorker from "monaco-tailwind/tailwind.worker?worker";
-import highlighter from "stores/highlighter";
 
 const dataProviders = { tailwindcssData },
   data = { dataProviders },
@@ -29,4 +27,3 @@ monaco.languages.css.cssDefaults.setOptions({ data });
 
 configureMonacoSFC(monaco);
 configureMonacoTailwindcss(monaco, { languageSelector });
-shikiToMonaco(highlighter, monaco);

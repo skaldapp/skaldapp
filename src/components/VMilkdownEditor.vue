@@ -26,27 +26,23 @@ import { generateText } from "ai";
 import autocomplete from "assets/autocomplete.md?raw";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
+import { highlight, languages } from "prismjs";
 import { debounce, Lang, useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent, second } from "stores/defaults";
-import highlighter from "stores/highlighter";
 import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
-  dark = "nord",
   dataStore = useDataStore(),
   deco = DecorationSet.empty,
   ioStore = useIoStore(),
   key = new PluginKey("MilkdownCopilot"),
-  lang = "mdc",
-  light = "github-light-default",
   mainStore = useMainStore(),
   message = "",
   system = autocomplete.replace("{{ locale }}", Lang.getLocale() ?? "en-US"),
-  themes = { dark, light },
   urls = new Map(),
   yaml = "---",
   { apiKey, selected } = storeToRefs(mainStore),
@@ -161,10 +157,9 @@ ${markdown}`
               "data-type": "html",
               "data-value": node.attrs.value,
             };
-            span.innerHTML = highlighter.codeToHtml(node.attrs.value, {
-              lang,
-              themes,
-            });
+            if (languages.html)
+              span.innerHTML = `<pre class="language-html"><code class="language-html">${highlight(node.attrs.value, languages.html, "html")}</code></pre>`;
+            else span.textContent = node.attrs.value;
             return ["span", attr, span.firstElementChild];
           },
         })),
