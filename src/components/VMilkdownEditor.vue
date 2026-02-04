@@ -11,7 +11,11 @@ import { createMistral } from "@ai-sdk/mistral";
 import { Crepe } from "@milkdown/crepe";
 import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
-import { parserCtx, serializerCtx } from "@milkdown/kit/core";
+import {
+  parserCtx,
+  remarkStringifyOptionsCtx,
+  serializerCtx,
+} from "@milkdown/kit/core";
 import { htmlAttr, htmlSchema } from "@milkdown/kit/preset/commonmark";
 import { cloneTr } from "@milkdown/kit/prose";
 import { DOMParser, DOMSerializer } from "@milkdown/kit/prose/model";
@@ -146,7 +150,12 @@ ${markdown}`
           );
         });
       })
-      .editor.use(emoji)
+      .editor.config((ctx) => {
+        ctx.set(remarkStringifyOptionsCtx, {
+          handlers: { text: ({ value }) => value },
+        });
+      })
+      .use(emoji)
       .use(
         htmlSchema.extendSchema((prev) => (ctx) => ({
           ...prev(ctx),
