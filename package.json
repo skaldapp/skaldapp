@@ -92,7 +92,7 @@
     "@quasar/extras": "^1.17.0",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.5",
     "@skaldapp/configs": "^1.2.52",
-    "@skaldapp/runtime": "^3.0.26",
+    "@skaldapp/runtime": "^3.0.27",
     "@types/markdown-it-emoji": "^3.0.1",
     "@types/markdown-it-footnote": "^3.0.4",
     "@types/path-browserify": "^1.0.3",
