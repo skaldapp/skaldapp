@@ -1,7 +1,7 @@
 import type { TPage } from "@skaldapp/shared";
+import type { SerializableHead } from "unhead/types";
 
 import { sharedStore } from "@skaldapp/shared";
-import { InferSeoMetaPlugin } from "@unhead/addons";
 import { createHead, renderSSRHead } from "@unhead/vue/server";
 import { useFetch } from "@vueuse/core";
 import { parse } from "hexo-front-matter";
@@ -13,6 +13,8 @@ import { useIoStore } from "stores/io";
 import {
   AliasSortingPlugin,
   CanonicalPlugin,
+  FlatMetaPlugin,
+  InferSeoMetaPlugin,
   TemplateParamsPlugin,
 } from "unhead/plugins";
 import { ref, toRefs } from "vue";
@@ -66,9 +68,7 @@ export const useDataStore = defineStore("data", () => {
           value ||
             `---
 title: Title
-meta:
-  - name: description
-    content: Description
+description: Description
 attrs:
   un-cloak: true
   class:
@@ -107,26 +107,61 @@ icon: twemoji:page-facing-up
       (nodes.value as TAppPage[]).forEach(({ branch, path }) => {
         if (path !== undefined) {
           oldPages.push(path);
-          const vueHeadClient = createHead({
-            plugins: [
-              TemplateParamsPlugin,
-              AliasSortingPlugin,
-              ...(domain.value
-                ? [
-                    CanonicalPlugin({
-                      canonicalHost: `https://${domain.value}`,
-                    }),
-                  ]
-                : []),
-              InferSeoMetaPlugin(),
-            ],
-          });
+          const href =
+              Array(branch.length - 1)
+                .fill("..")
+                .join("/") || "./",
+            vueHeadClient = createHead({
+              plugins: [
+                TemplateParamsPlugin,
+                AliasSortingPlugin,
+                FlatMetaPlugin,
+                ...(domain.value
+                  ? [
+                      CanonicalPlugin({
+                        canonicalHost: `https://${domain.value}`,
+                      }),
+                    ]
+                  : []),
+                InferSeoMetaPlugin(),
+              ],
+            });
           branch.forEach(({ frontmatter }, index) => {
             if (
               branch.length - 1 === index ||
               (frontmatter.template && !frontmatter.hidden)
             ) {
-              vueHeadClient.push(frontmatter);
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { attrs, hidden, icon, template, ...head } = frontmatter,
+                {
+                  base = { href },
+                  bodyAttrs,
+                  htmlAttrs,
+                  link,
+                  meta,
+                  noscript,
+                  script,
+                  style,
+                  templateParams,
+                  title,
+                  titleTemplate,
+                  ..._flatMeta
+                } = head as SerializableHead;
+              vueHeadClient.push({
+                // @ts-expect-error runtime type
+                _flatMeta,
+                base,
+                bodyAttrs,
+                htmlAttrs,
+                link,
+                meta,
+                noscript,
+                script,
+                style,
+                templateParams,
+                title,
+                titleTemplate,
+              });
             }
           });
           void (async () => {
@@ -135,17 +170,11 @@ icon: twemoji:page-facing-up
                 const { headTags } = await renderSSRHead(vueHeadClient);
                 await putObject(
                   path ? `${path}/index.html` : "index.html",
-                  body.value
-                    .replace(
-                      "<head>",
-                      `<head>
-    <base href="${
-      Array(branch.length - 1)
-        .fill("..")
-        .join("/") || "./"
-    }">`,
-                    )
-                    .replace("{{ head }}", headTags),
+                  body.value.replace(
+                    "<head>",
+                    `<head>
+${headTags}`,
+                  ),
                   "text/html",
                 );
               } catch (error) {

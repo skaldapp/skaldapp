@@ -1,4 +1,4 @@
-export const cache: RequestCache = "no-cache",
+export const cache: RequestCache = "no-store",
   cancel = true,
   configurable = true,
   deep = true,
