@@ -14,7 +14,7 @@ q-layout(view="hHh LpR lff", @keyup.esc="rightDrawer = false")
         :class="{ invisible: bucket && $q.screen.lt.sm }"
       )
         | SK
-        q-icon.align-text-bottom(name="svguse:favicon.svg", size="md")
+        q-icon.align-text-bottom(name="img:favicon.svg", size="md")
         | LD
       q-chip.q-mx-md(
         v-if="bucket",
