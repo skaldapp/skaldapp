@@ -110,7 +110,7 @@ icon: twemoji:page-facing-up
           const href =
               Array(branch.length - 1)
                 .fill("..")
-                .join("/") || "./",
+                .join("/") || ".",
             vueHeadClient = createHead({
               plugins: [
                 TemplateParamsPlugin,
@@ -134,7 +134,7 @@ icon: twemoji:page-facing-up
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { attrs, hidden, icon, template, ...head } = frontmatter,
                 {
-                  base = { href },
+                  base, // eslint-disable-line @typescript-eslint/no-unused-vars
                   bodyAttrs,
                   htmlAttrs,
                   link,
@@ -150,7 +150,7 @@ icon: twemoji:page-facing-up
               vueHeadClient.push({
                 // @ts-expect-error runtime type
                 _flatMeta,
-                base,
+                base: { href },
                 bodyAttrs,
                 htmlAttrs,
                 link,
