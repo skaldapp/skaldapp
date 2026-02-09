@@ -188,10 +188,12 @@ ${headTags}`,
       await putObject(
         "sitemap.txt",
         nodes.value
-          .map(({ frontmatter: { hidden }, to }) =>
-            domain.value && to && !hidden
-              ? `https://${domain.value}${to === "/" ? "" : encodeURI(to)}`
-              : undefined,
+          .map(
+            ({ frontmatter: { hidden }, to }) =>
+              domain.value &&
+              to &&
+              !hidden &&
+              `https://${domain.value}${to === "/" ? "" : encodeURI(to)}`,
           )
           .filter(Boolean)
           .join("\n"),

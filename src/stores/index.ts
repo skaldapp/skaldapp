@@ -27,7 +27,7 @@ declare module "pinia" {
  * with the Store instance.
  */
 
-export default defineStore((/* { ssrContext } */) => {
+export default defineStore(() => {
   const ciphertext = true,
     name = "skald",
     pinia = createPinia(),

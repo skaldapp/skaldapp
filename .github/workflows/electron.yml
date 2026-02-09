@@ -15,8 +15,8 @@ jobs:
           - windows-latest
           - ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
       - run: npm ci
       - if: matrix.os == 'ubuntu-latest'
         run: sudo snap install snapcraft --classic

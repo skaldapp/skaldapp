@@ -29,7 +29,6 @@ const createWindow = async () => {
     mainWindow = undefined;
   });
   mainWindow.show();
-  // mainWindow.webContents.openDevTools();
 };
 
 initialize();
