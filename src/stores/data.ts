@@ -31,7 +31,8 @@ export const useDataStore = defineStore("data", () => {
     { $nodes, kvNodes, nodes } = toRefs(sharedStore),
     { data: body } = useFetch(`runtime/index.html`).text(),
     { deleteObject, getObjectText, putObject, removeEmptyDirectories } =
-      ioStore;
+      ioStore,
+    { isRedirect } = sharedStore;
 
   const parseFrontmatter = (id: string) => {
     const model = editor.getModel(Uri.parse(`file:///${id}.md`));
@@ -105,88 +106,95 @@ icon: twemoji:page-facing-up
       await removeEmptyDirectories();
       oldPages.length = 0;
       ($nodes.value as TAppPage[]).forEach(
-        ({ $branch, $children, branch, frontmatter: { template }, path }) => {
-          if (path !== undefined) {
-            oldPages.push(path);
-            const href =
-                Array(branch.length - 1)
-                  .fill("..")
-                  .join("/") || ".",
-              vueHeadClient = createHead({
-                plugins: [
-                  TemplateParamsPlugin,
-                  AliasSortingPlugin,
-                  FlatMetaPlugin,
-                  ...(domain.value
-                    ? [
-                        CanonicalPlugin({
-                          canonicalHost: `https://${domain.value}`,
-                        }),
-                      ]
-                    : []),
-                  InferSeoMetaPlugin(),
-                ],
-              });
-            [...$branch, ...(template ? $children.slice(0, 1) : [])].forEach(
-              (
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                { frontmatter: { attrs, hidden, icon, template, ...head } },
-                index,
-                array,
-              ) => {
-                if (array.length - 1 === index || template) {
-                  const {
-                    base, // eslint-disable-line @typescript-eslint/no-unused-vars
-                    bodyAttrs,
-                    htmlAttrs,
-                    link,
-                    meta,
-                    noscript,
-                    script,
-                    style,
-                    templateParams,
-                    title,
-                    titleTemplate,
-                    ..._flatMeta
-                  } = head as SerializableHead;
+        ({ $branch, branch, children, frontmatter: { template }, path }) => {
+          const href =
+              Array(branch.length - 1)
+                .fill("..")
+                .join("/") || ".",
+            vueHeadClient = createHead({
+              plugins: [
+                TemplateParamsPlugin,
+                AliasSortingPlugin,
+                FlatMetaPlugin,
+                ...(domain.value
+                  ? [
+                      CanonicalPlugin({
+                        canonicalHost: `https://${domain.value}`,
+                      }),
+                    ]
+                  : []),
+                InferSeoMetaPlugin(),
+              ],
+            });
 
-                  vueHeadClient.push({
-                    // @ts-expect-error runtime type
-                    _flatMeta,
-                    base: { href },
-                    bodyAttrs,
-                    htmlAttrs,
-                    link,
-                    meta,
-                    noscript,
-                    script,
-                    style,
-                    templateParams,
-                    title,
-                    titleTemplate,
-                  });
-                }
-              },
-            );
+          if (path !== undefined) oldPages.push(path);
 
-            void (async () => {
-              if (body.value)
-                try {
-                  const { headTags } = await renderSSRHead(vueHeadClient);
-                  await putObject(
-                    path ? `${path}/index.html` : "index.html",
-                    body.value.replace(
-                      "<head>",
-                      `<head>
+          [
+            ...$branch,
+            ...(template
+              ? children
+                  .filter(({ frontmatter: { hidden } }: TPage) => !hidden)
+                  .slice(0, 1)
+              : []),
+          ].forEach(
+            (
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              { frontmatter: { attrs, hidden, icon, template, ...head } },
+              index,
+              array,
+            ) => {
+              if (array.length - 1 === index || template) {
+                const {
+                  base, // eslint-disable-line @typescript-eslint/no-unused-vars
+                  bodyAttrs,
+                  htmlAttrs,
+                  link,
+                  meta,
+                  noscript,
+                  script,
+                  style,
+                  templateParams,
+                  title,
+                  titleTemplate,
+                  ..._flatMeta
+                } = head as SerializableHead;
+
+                vueHeadClient.push({
+                  // @ts-expect-error runtime type
+                  _flatMeta,
+                  base: { href },
+                  bodyAttrs,
+                  htmlAttrs,
+                  link,
+                  meta,
+                  noscript,
+                  script,
+                  style,
+                  templateParams,
+                  title,
+                  titleTemplate,
+                });
+              }
+            },
+          );
+
+          void (async () => {
+            if (body.value)
+              try {
+                const { headTags } = await renderSSRHead(vueHeadClient);
+                await putObject(
+                  path ? `${path}/index.html` : "index.html",
+                  body.value.replace(
+                    "<head>",
+                    `<head>
 ${headTags}`,
-                    ),
-                    "text/html",
-                  );
-                } catch (error) {
-                  console.error(error);
-                }
-            })();
-          }
+                  ),
+                  "text/html",
+                );
+              } catch (error) {
+                console.error(error);
+              }
+          })();
         },
       );
     },
@@ -195,12 +203,12 @@ ${headTags}`,
         "sitemap.txt",
         domain.value
           ? $nodes.value
+              .filter((node) => !isRedirect(node))
               .map(
                 ({ to }) =>
                   to &&
                   `https://${domain.value}${to === "/" ? "" : encodeURI(to)}`,
               )
-              .filter(Boolean)
               .join("\n")
           : "",
         "text/plain",
