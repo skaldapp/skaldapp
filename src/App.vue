@@ -5,6 +5,7 @@ router-view
 <script setup lang="ts">
 import { sharedStore } from "@skaldapp/shared";
 import { useFetch } from "@vueuse/core";
+import { jsonrepair } from "jsonrepair";
 import { editor } from "monaco-editor";
 import { storeToRefs } from "pinia";
 import { useDataStore } from "stores/data";
@@ -45,7 +46,7 @@ watch(bucket, async (value) => {
 
     const [cname = ""] = getCname?.split("\n", 1) ?? [],
       [localManifest, serverManifest] = (
-        [manifest.value, JSON.parse(getManifest ?? "{}")] as Record<
+        [manifest.value, JSON.parse(jsonrepair(getManifest ?? "{}"))] as Record<
           string,
           Record<string, string[]> | undefined
         >[]
@@ -60,7 +61,7 @@ watch(bucket, async (value) => {
       ),
       files = ["robots.txt", ".nojekyll"];
 
-    tree.value = JSON.parse(getIndex ?? "[{}]");
+    tree.value = JSON.parse(jsonrepair(getIndex ?? "[{}]"));
     domain.value = cname;
     if (localManifest && serverManifest) {
       (

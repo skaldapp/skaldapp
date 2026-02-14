@@ -28,11 +28,11 @@ export const useDataStore = defineStore("data", () => {
     ioStore = useIoStore(),
     message = ref(""),
     oldPages: string[] = [],
-    { $nodes, kvNodes, nodes } = toRefs(sharedStore),
     { data: body } = useFetch(`runtime/index.html`).text(),
     { deleteObject, getObjectText, putObject, removeEmptyDirectories } =
       ioStore,
-    { isRedirect } = sharedStore;
+    { kvNodes, nodes } = toRefs(sharedStore),
+    { removeHiddens } = sharedStore;
 
   const parseFrontmatter = (id: string) => {
     const model = editor.getModel(Uri.parse(`file:///${id}.md`));
@@ -105,8 +105,8 @@ icon: twemoji:page-facing-up
       await Promise.allSettled(promises);
       await removeEmptyDirectories();
       oldPages.length = 0;
-      ($nodes.value as TAppPage[]).forEach(
-        ({ $branch, branch, children, frontmatter: { template }, path }) => {
+      removeHiddens(nodes.value).forEach(
+        ({ branch, children, frontmatter: { template }, path }) => {
           const href =
               Array(branch.length - 1)
                 .fill("..")
@@ -130,12 +130,8 @@ icon: twemoji:page-facing-up
           if (path !== undefined) oldPages.push(path);
 
           [
-            ...$branch,
-            ...(template
-              ? children
-                  .filter(({ frontmatter: { hidden } }: TPage) => !hidden)
-                  .slice(0, 1)
-              : []),
+            ...removeHiddens(branch),
+            ...(template ? removeHiddens(children).slice(0, 1) : []),
           ].forEach(
             (
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -202,8 +198,7 @@ ${headTags}`,
       await putObject(
         "sitemap.txt",
         domain.value
-          ? $nodes.value
-              .filter((node) => !isRedirect(node))
+          ? removeHiddens(nodes.value, true)
               .map(
                 ({ to }) =>
                   to &&
