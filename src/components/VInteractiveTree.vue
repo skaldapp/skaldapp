@@ -1,27 +1,4 @@
 <template lang="pug">
-q-page-sticky(:offset="[15, 15]", position="bottom-right")
-  Transition(
-    appear,
-    enter-active-class="animated zoomIn",
-    leave-active-class="animated zoomOut"
-  )
-    q-fab(
-      v-if="visible",
-      v-model="state",
-      color="accent",
-      direction="up",
-      icon="add"
-    )
-      q-fab-action(color="primary", icon="note", @click="clickAdd")
-      q-fab-action(color="primary", icon="delete", @click="clickRemove")
-      q-fab-action(color="secondary", icon="chevron_left", @click="clickLeft")
-      q-fab-action(
-        color="secondary",
-        icon="chevron_right",
-        @click="clickRight"
-      )
-      q-fab-action(color="secondary", icon="expand_more", @click="clickDown")
-      q-fab-action(color="secondary", icon="expand_less", @click="clickUp")
 .scroll.col
   q-tree.q-ma-md(
     v-if="nodes[0]",
@@ -63,6 +40,29 @@ q-page-sticky(:offset="[15, 15]", position="bottom-right")
               v-if="prop.node.frontmatter.template",
               name="picture_in_picture_alt"
             )
+q-page-sticky(:offset="[15, 15]", position="bottom-right")
+  Transition(
+    appear,
+    enter-active-class="animated zoomIn",
+    leave-active-class="animated zoomOut"
+  )
+    q-fab(
+      v-if="visible",
+      v-model="state",
+      color="accent",
+      direction="up",
+      icon="add"
+    )
+      q-fab-action(color="primary", icon="note", @click="clickAdd")
+      q-fab-action(color="primary", icon="delete", @click="clickRemove")
+      q-fab-action(color="secondary", icon="chevron_left", @click="clickLeft")
+      q-fab-action(
+        color="secondary",
+        icon="chevron_right",
+        @click="clickRight"
+      )
+      q-fab-action(color="secondary", icon="expand_more", @click="clickDown")
+      q-fab-action(color="secondary", icon="expand_less", @click="clickUp")
 </template>
 <script setup lang="ts">
 import type { TPage } from "@skaldapp/shared";
