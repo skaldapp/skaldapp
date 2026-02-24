@@ -28,11 +28,11 @@ export const useDataStore = defineStore("data", () => {
     ioStore = useIoStore(),
     message = ref(""),
     oldPages: string[] = [],
+    { $nodes, kvNodes, nodes } = toRefs(sharedStore),
     { data: body } = useFetch(`runtime/index.html`).text(),
     { deleteObject, getObjectText, putObject, removeEmptyDirectories } =
       ioStore,
-    { kvNodes, nodes } = toRefs(sharedStore),
-    { removeHiddens } = sharedStore;
+    { isRedirect, LEAD_TRAIL_SLASH_RE } = sharedStore;
 
   const parseFrontmatter = (id: string) => {
     const model = editor.getModel(Uri.parse(`file:///${id}.md`));
@@ -105,8 +105,8 @@ icon: twemoji:page-facing-up
       await Promise.allSettled(promises);
       await removeEmptyDirectories();
       oldPages.length = 0;
-      removeHiddens(nodes.value).forEach(
-        ({ branch, children, frontmatter: { template }, path }) => {
+      $nodes.value.forEach(
+        ({ $branch, $children, branch, frontmatter: { template }, path }) => {
           const href =
               Array(branch.length - 1)
                 .fill("..")
@@ -129,10 +129,7 @@ icon: twemoji:page-facing-up
 
           if (path !== undefined) oldPages.push(path);
 
-          [
-            ...removeHiddens(branch),
-            ...(template ? removeHiddens(children).slice(0, 1) : []),
-          ].forEach(
+          [...$branch, ...(template ? $children.slice(0, 1) : [])].forEach(
             (
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               { frontmatter: { attrs, hidden, icon, template, ...head } },
@@ -198,11 +195,12 @@ ${headTags}`,
       await putObject(
         "sitemap.txt",
         domain.value
-          ? removeHiddens(nodes.value, true)
+          ? $nodes.value
+              .filter((node) => !isRedirect(node))
               .map(
-                ({ to }) =>
-                  to &&
-                  `https://${domain.value}${to === "/" ? "" : encodeURI(to)}`,
+                ({ path }) =>
+                  path !== undefined &&
+                  `https://${domain.value}${path && encodeURI(path.replace(LEAD_TRAIL_SLASH_RE, "/"))}`,
               )
               .join("\n")
           : "",
