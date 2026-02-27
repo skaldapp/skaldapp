@@ -22,6 +22,7 @@ import { DOMParser, DOMSerializer } from "@milkdown/kit/prose/model";
 import { Plugin, PluginKey } from "@milkdown/kit/prose/state";
 import { Decoration, DecorationSet } from "@milkdown/kit/prose/view";
 import { $prose } from "@milkdown/kit/utils";
+import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import { useStyleTag } from "@vueuse/core";
@@ -154,6 +155,7 @@ ${markdown}`
           handlers: { text: ({ value }) => value },
         });
       })
+      .use(emoji)
       .use(
         htmlSchema.extendSchema((prev) => (ctx) => ({
           ...prev(ctx),
