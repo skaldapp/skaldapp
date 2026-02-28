@@ -14,9 +14,7 @@ const [route] = routes,
   { tree } = toRefs(sharedStore);
 
 export default defineBoot(({ router }) => {
-  router.beforeEach(({ path }, _from, next) => {
-    if (["/", "/main"].includes(path)) next();
-    else next("/");
+  router.beforeEach(({ path }) => {
     if (path === "/" && route) {
       reset();
       selected.value = "";
@@ -24,5 +22,7 @@ export default defineBoot(({ router }) => {
       router.clearRoutes();
       router.addRoute(route);
     }
+    if (["/", "/main"].includes(path)) return undefined;
+    else return "/";
   });
 });
