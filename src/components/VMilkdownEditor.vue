@@ -40,6 +40,7 @@ import { onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
+  blockCaptionPlaceholderText = "Write Image Title",
   dataStore = useDataStore(),
   deco = DecorationSet.empty,
   ioStore = useIoStore(),
@@ -97,7 +98,11 @@ const clearUrls = () => {
     return urls.get(url) ?? url;
   },
   featureConfigs = {
-    [Crepe.Feature.ImageBlock]: { onUpload, proxyDomURL },
+    [Crepe.Feature.ImageBlock]: {
+      blockCaptionPlaceholderText,
+      onUpload,
+      proxyDomURL,
+    },
   },
   getHint = debounce(async ({ get }: Ctx, view: EditorView) => {
     const {
