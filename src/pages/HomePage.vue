@@ -156,21 +156,20 @@ const add = () => {
     }).onOk((payload: string) => {
       const cred = credential.value[name];
       if (cred)
-        if (name === cred.Bucket) {
+        if (name === cred.Bucket)
           Object.keys(cred).forEach((key) => {
             cred[key as keyof TCredential] = AES.encrypt(
               cred[key as keyof TCredential] ?? "",
               payload,
             ).toString();
           });
-        } else {
+        else
           Object.keys(cred).forEach((key) => {
             cred[key as keyof TCredential] = AES.decrypt(
               cred[key as keyof TCredential] ?? "",
               payload,
             ).toString(Utf8);
           });
-        }
     });
   },
   login = async (bucketValue: string) => {
