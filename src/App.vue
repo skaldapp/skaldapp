@@ -15,6 +15,7 @@ import { toRefs, watch } from "vue";
 
 const dataStore = useDataStore(),
   ioStore = useIoStore(),
+  textEncoder = new TextEncoder(),
   { bucket } = toRefs(ioStore),
   { data: manifest } = useFetch("runtime/.vite/manifest.json").json<
     Record<string, Record<string, string>>
@@ -77,20 +78,28 @@ watch(bucket, async (value) => {
           void deleteObject(element);
         });
 
-      await Promise.allSettled(
-        [...localManifest.add(".vite/manifest.json")]
-          .filter((x) => !serverManifest.has(x))
-          .map(async (element) => {
-            const body = await (await fetch(`runtime/${element}`)).blob();
-            return putObject(
-              element,
-              new Uint8Array(await body.arrayBuffer()),
-              body.type,
-            );
-          }),
-      );
-
-      void putPages();
+      try {
+        await Promise.all(
+          [...localManifest]
+            .filter((x) => !serverManifest.has(x))
+            .map(async (element) => {
+              const body = await (await fetch(`runtime/${element}`)).blob();
+              return putObject(
+                element,
+                new Uint8Array(await body.arrayBuffer()),
+                body.type,
+              );
+            }),
+        );
+        void putObject(
+          ".vite/manifest.json",
+          textEncoder.encode(JSON.stringify(manifest.value)),
+          "application/json",
+        );
+        void putPages();
+      } catch {
+        //
+      }
     }
   } else {
     tree.value.length = 0;
