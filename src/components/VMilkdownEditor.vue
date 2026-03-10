@@ -27,11 +27,11 @@ import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import { useStyleTag } from "@vueuse/core";
 import { generateText } from "ai";
-import autocomplete from "assets/autocomplete.md?raw";
+import system from "assets/autocomplete.md?raw";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { highlight, languages } from "prismjs";
-import { debounce, Lang, useQuasar } from "quasar";
+import { debounce, useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent, second } from "stores/defaults";
 import { useIoStore } from "stores/io";
@@ -47,7 +47,6 @@ const $q = useQuasar(),
   key = new PluginKey("MilkdownCopilot"),
   mainStore = useMainStore(),
   message = "",
-  system = autocomplete.replace("{{ locale }}", Lang.getLocale() ?? "en-US"),
   urls = new Map(),
   yaml = "---",
   { apiKey, selected } = storeToRefs(mainStore),
@@ -274,7 +273,7 @@ watch(
   apiKey,
   (value) => {
     model = value
-      ? createMistral({ apiKey: value })("mistral-large-latest")
+      ? createMistral({ apiKey: value })("codestral-latest")
       : undefined;
   },
   { immediate },
