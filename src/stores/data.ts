@@ -4,6 +4,7 @@ import type { SerializableHead } from "unhead/types";
 import { sharedStore } from "@skaldapp/shared";
 import { createHead, renderSSRHead } from "@unhead/vue/server";
 import { useFetch } from "@vueuse/core";
+import init from "assets/init.md?raw";
 import { parse } from "hexo-front-matter";
 import { editor, Uri } from "monaco-editor";
 import { acceptHMRUpdate, defineStore } from "pinia";
@@ -65,28 +66,7 @@ export const useDataStore = defineStore("data", () => {
       }, second);
       if (!model) {
         const value = await getObjectText(`docs/${id}.md`, cache);
-        model = editor.createModel(
-          value ||
-            `---
-title: Title
-description: Description
-attrs:
-  un-cloak: true
-  class:
-    - container
-    - mx-auto
-    - prose
-    - prose-sm
-    - sm:prose-base
-    - dark:prose-invert
-hidden: false
-template: false
-icon: twemoji:page-facing-up
----
-`,
-          "markdown",
-          uri,
-        );
+        model = editor.createModel(value || init, "markdown", uri);
         model.onDidChangeContent(() => {
           message.value = parseFrontmatter(id);
           putObjectDebounced();
