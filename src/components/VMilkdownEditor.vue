@@ -4,10 +4,8 @@ Milkdown
 
 <script setup lang="ts">
 import type { Ctx } from "@milkdown/kit/ctx";
-import type { LanguageModel } from "ai";
 import type { EditorView } from "prosemirror-view";
 
-import { createMistral } from "@ai-sdk/mistral";
 import { Crepe } from "@milkdown/crepe";
 import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
@@ -26,14 +24,19 @@ import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import { useStyleTag } from "@vueuse/core";
-import { generateText } from "ai";
-import system from "assets/autocomplete.md?raw";
 import { split } from "hexo-front-matter";
+import { CompletionCopilot } from "monacopilot";
 import { storeToRefs } from "pinia";
 import { highlight, languages } from "prismjs";
 import { debounce, useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
-import { cancel, immediate, persistent, second } from "stores/defaults";
+import {
+  cancel,
+  immediate,
+  persistent,
+  second,
+  technologies,
+} from "stores/defaults";
 import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { onUnmounted, watch } from "vue";
@@ -45,8 +48,12 @@ const $q = useQuasar(),
   deco = DecorationSet.empty,
   ioStore = useIoStore(),
   key = new PluginKey("MilkdownCopilot"),
+  language = "markdown",
   mainStore = useMainStore(),
   message = "",
+  model = "codestral",
+  provider = "mistral",
+  relatedFiles = undefined,
   urls = new Map(),
   yaml = "---",
   { apiKey, selected } = storeToRefs(mainStore),
@@ -55,8 +62,8 @@ const $q = useQuasar(),
   { getObjectBlob, headObject, putObject } = ioStore,
   { t } = useI18n();
 
-let front = "",
-  model: LanguageModel | undefined,
+let copilot: CompletionCopilot | undefined,
+  front = "",
   textModel = await getModel(selected.value);
 
 const clearUrls = () => {
@@ -104,22 +111,47 @@ const clearUrls = () => {
     },
   },
   getHint = debounce(async ({ get }: Ctx, view: EditorView) => {
-    const {
-      dispatch,
-      state: {
-        schema: { topNodeType },
-        tr: {
-          doc,
-          selection: { from },
+    if (copilot) {
+      const column = NaN,
+        lineNumber = NaN,
+        cursorPosition = { column, lineNumber },
+        filename = `${selected.value}.md`,
+        {
+          dispatch,
+          state: {
+            schema: { topNodeType },
+            tr: {
+              doc,
+              selection: { from },
+            },
+          },
+        } = view,
+        { content: after } = doc.slice(from),
+        textAfterCursor = get(serializerCtx)(
+          topNodeType.createAndFill(undefined, after) ??
+            topNodeType.create(undefined, after),
+        ).replace(/^<br \/>|<br \/>$/, ""),
+        { content: before } = doc.slice(0, from),
+        textBeforeCursor = get(serializerCtx)(
+          topNodeType.createAndFill(undefined, before) ??
+            topNodeType.create(undefined, before),
+        )
+          .replace(/^<br \/>|<br \/>$/, "")
+          .trim(),
+        completionMetadata = {
+          cursorPosition,
+          filename,
+          language,
+          relatedFiles,
+          technologies,
+          textAfterCursor,
+          textBeforeCursor,
         },
-      },
-    } = view;
-    const { content } = doc.slice(0, from);
-    const node = topNodeType.createAndFill(undefined, content);
-    if (node && model) {
-      const prompt = get(serializerCtx)(node);
-      const { text } = await generateText({ model, prompt, system });
-      dispatch(cloneTr(view.state.tr).setMeta(key, text));
+        body = { completionMetadata },
+        { completion } = await copilot.complete({ body });
+
+      if (completion?.replace(/^<br \/>|<br \/>$/, "").trim())
+        dispatch(cloneTr(view.state.tr).setMeta(key, completion));
     }
   }, second),
   getValue = () => {
@@ -191,28 +223,22 @@ ${markdown}`
                   const { content } = ctx.get(parserCtx)(message);
 
                   dispatch(tr.setMeta(key, ""));
-                  switch (event.key) {
-                    case " ":
-                    case "Enter":
-                      getHint(ctx, view);
-                      break;
-                    case "Tab":
-                      if (message) {
-                        event.preventDefault();
-                        dispatch(
-                          tr.replaceSelection(
-                            DOMParser.fromSchema(schema).parseSlice(
-                              DOMSerializer.fromSchema(
-                                schema,
-                              ).serializeFragment(content),
-                            ),
+                  if (event.key === "Tab" && message) {
+                    event.preventDefault();
+                    dispatch(
+                      tr.replaceSelection(
+                        DOMParser.fromSchema(schema).parseSlice(
+                          DOMSerializer.fromSchema(schema).serializeFragment(
+                            content,
                           ),
-                        );
-                        return true;
-                      } else getHint.cancel();
-                      break;
-                    default:
-                      getHint.cancel();
+                        ),
+                      ),
+                    );
+                    return true;
+                  } else {
+                    if (event.key === "Enter" || event.key.length === 1)
+                      getHint(ctx, view);
+                    else getHint.cancel();
                   }
                 },
               },
@@ -272,8 +298,8 @@ watch(
 watch(
   apiKey,
   (value) => {
-    model = value
-      ? createMistral({ apiKey: value })("codestral-latest")
+    copilot = value
+      ? new CompletionCopilot(value, { model, provider })
       : undefined;
   },
   { immediate },

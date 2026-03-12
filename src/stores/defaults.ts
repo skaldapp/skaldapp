@@ -9,4 +9,5 @@ export const cache: RequestCache = "no-store",
   once = true,
   persistent = true,
   second = 1000,
+  technologies = ["vue", "tailwindcss", "comark"],
   writable = true;

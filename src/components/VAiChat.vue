@@ -37,7 +37,12 @@ import type { ComponentPublicInstance } from "vue";
 import { createMistral } from "@ai-sdk/mistral";
 import { Chat } from "@ai-sdk/vue";
 import { whenever } from "@vueuse/core";
-import { convertToModelMessages, streamText } from "ai";
+import {
+  convertToModelMessages,
+  defaultSettingsMiddleware,
+  streamText,
+  wrapLanguageModel,
+} from "ai";
 import abbreviation from "markdown-it-abbr";
 import deflist from "markdown-it-deflist";
 import { full as emoji } from "markdown-it-emoji";
@@ -68,7 +73,6 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
       const result = streamText({
         messages: await convertToModelMessages(messages),
         model: this.model,
-        providerOptions: { mistral: { safePrompt: true } },
       });
       return result.toUIMessageStream();
     } else throw new Error("The model is not defined.");
@@ -110,7 +114,12 @@ watch(
   (value) => {
     transport.updateModel(
       value
-        ? createMistral({ apiKey: value })("mistral-large-latest")
+        ? wrapLanguageModel({
+            middleware: defaultSettingsMiddleware({
+              settings: { providerOptions: { mistral: { safePrompt: true } } },
+            }),
+            model: createMistral({ apiKey: value })("mistral-large-latest"),
+          })
         : undefined,
     );
   },

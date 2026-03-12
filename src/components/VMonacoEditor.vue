@@ -14,7 +14,7 @@ import { CompletionCopilot, registerCompletion } from "monacopilot";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
-import { enabled, immediate } from "stores/defaults";
+import { enabled, immediate, technologies } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
 
@@ -41,7 +41,6 @@ const $q = useQuasar(),
   startColumn = 1,
   startLineNumber = 2,
   tabSize = 2,
-  technologies = ["vue", "tailwindcss", "comark"],
   unicodeHighlight = { ambiguousCharacters },
   { apiKey, selected } = storeToRefs(mainStore),
   { getModel } = dataStore,
