@@ -77,7 +77,7 @@ export const useS3Store = defineStore("s3", () => {
         await s3Client.send(new HeadBucketCommand({ Bucket }));
       } catch (err) {
         setS3Client();
-        throw new Error(err as string);
+        throw new Error(err as string, { cause: err });
       }
     },
     headObject = async (

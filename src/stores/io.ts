@@ -34,7 +34,7 @@ export const useIoStore = defineStore("io", () => {
         remote = true;
       } catch (err) {
         const { message } = err as Error;
-        throw new Error(message);
+        throw new Error(message, { cause: err });
       }
     },
     headObject = async (Key: string, ResponseCacheControl?: string) => {
