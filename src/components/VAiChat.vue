@@ -118,7 +118,7 @@ watch(
             middleware: defaultSettingsMiddleware({
               settings: { providerOptions: { mistral: { safePrompt: true } } },
             }),
-            model: createMistral({ apiKey: value })("mistral-large-latest"),
+            model: createMistral({ apiKey: value })("codestral-latest"),
           })
         : undefined,
     );
