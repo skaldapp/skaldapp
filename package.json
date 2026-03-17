@@ -85,7 +85,6 @@
     "pinia": "^3.0.4",
     "pinia-plugin-store": "^3.0.8",
     "prismjs": "^1.30.0",
-    "prosemirror-view": "^1.41.6",
     "quasar": "^2.18.7",
     "unhead": "^2.1.12",
     "vue": "^3.5.30",
