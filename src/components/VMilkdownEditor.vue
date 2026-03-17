@@ -3,41 +3,24 @@ Milkdown
 </template>
 
 <script setup lang="ts">
-import type { Ctx } from "@milkdown/kit/ctx";
 import type { Handle } from "mdast-util-to-markdown";
-import type { EditorView } from "prosemirror-view";
 
 import { Crepe } from "@milkdown/crepe";
 import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
-import {
-  parserCtx,
-  remarkStringifyOptionsCtx,
-  serializerCtx,
-} from "@milkdown/kit/core";
-import { htmlAttr, htmlSchema } from "@milkdown/kit/preset/commonmark";
-import { cloneTr } from "@milkdown/kit/prose";
-import { DOMParser, DOMSerializer } from "@milkdown/kit/prose/model";
-import { Plugin, PluginKey } from "@milkdown/kit/prose/state";
-import { Decoration, DecorationSet } from "@milkdown/kit/prose/view";
-import { $prose } from "@milkdown/kit/utils";
+import { remarkStringifyOptionsCtx } from "@milkdown/kit/core";
+import { htmlSchema } from "@milkdown/kit/preset/commonmark";
 import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import { useStyleTag } from "@vueuse/core";
 import { split } from "hexo-front-matter";
-import { CompletionCopilot } from "monacopilot";
 import { storeToRefs } from "pinia";
-import { highlight, languages } from "prismjs";
-import { debounce, useQuasar } from "quasar";
+import { useQuasar } from "quasar";
+import { copilotPlugin } from "stores/copilotPlugin";
 import { useDataStore } from "stores/data";
-import {
-  cancel,
-  immediate,
-  persistent,
-  second,
-  technologies,
-} from "stores/defaults";
+import { cancel, immediate, persistent } from "stores/defaults";
+import { htmlSchemaExtended } from "stores/html";
 import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { onUnmounted, watch } from "vue";
@@ -46,7 +29,6 @@ import { useI18n } from "vue-i18n";
 const $q = useQuasar(),
   blockCaptionPlaceholderText = "Write Image Title",
   dataStore = useDataStore(),
-  deco = DecorationSet.empty,
   link: Handle = (node, parent, state, info) =>
     ((text) =>
       text === node.url ? node.url : `[${text}](${node.url as string})`)(
@@ -55,23 +37,16 @@ const $q = useQuasar(),
   text: Handle = ({ value }) => value,
   handlers = { link, text },
   ioStore = useIoStore(),
-  key = new PluginKey("MilkdownCopilot"),
-  language = "markdown",
   mainStore = useMainStore(),
-  message = "",
-  model = "codestral",
-  provider = "mistral",
-  relatedFiles = undefined,
   urls = new Map(),
   yaml = "---",
-  { apiKey, selected } = storeToRefs(mainStore),
   { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
   { getModel } = dataStore,
   { getObjectBlob, headObject, putObject } = ioStore,
+  { selected } = storeToRefs(mainStore),
   { t } = useI18n();
 
-let copilot: CompletionCopilot | undefined,
-  front = "",
+let front = "",
   textModel = await getModel(selected.value);
 
 const clearUrls = () => {
@@ -118,50 +93,6 @@ const clearUrls = () => {
       proxyDomURL,
     },
   },
-  getHint = debounce(async ({ get }: Ctx, view: EditorView) => {
-    if (copilot) {
-      const column = NaN,
-        lineNumber = NaN,
-        cursorPosition = { column, lineNumber },
-        filename = `${selected.value}.md`,
-        {
-          dispatch,
-          state: {
-            schema: { topNodeType },
-            tr: {
-              doc,
-              selection: { from },
-            },
-          },
-        } = view,
-        { content: after } = doc.slice(from),
-        textAfterCursor = get(serializerCtx)(
-          topNodeType.createAndFill(undefined, after) ??
-            topNodeType.create(undefined, after),
-        ).replace(/^<br \/>|<br \/>$/, ""),
-        { content: before } = doc.slice(0, from),
-        textBeforeCursor = get(serializerCtx)(
-          topNodeType.createAndFill(undefined, before) ??
-            topNodeType.create(undefined, before),
-        )
-          .replace(/^<br \/>|<br \/>$/, "")
-          .trim(),
-        completionMetadata = {
-          cursorPosition,
-          filename,
-          language,
-          relatedFiles,
-          technologies,
-          textAfterCursor,
-          textBeforeCursor,
-        },
-        body = { completionMetadata },
-        { completion } = await copilot.complete({ body });
-
-      if (completion?.replace(/^<br \/>|<br \/>$/, "").trim())
-        dispatch(cloneTr(view.state.tr).setMeta(key, completion));
-    }
-  }, second),
   getValue = () => {
     const value = textModel.getValue(),
       { content, data, prefixSeparator, separator } = split(value);
@@ -173,7 +104,6 @@ const clearUrls = () => {
       return value;
     }
   },
-  init = () => ({ deco, message }),
   { get } = useEditor((root) => {
     const defaultValue = getValue(),
       crepe = new Crepe({ defaultValue, featureConfigs, root });
@@ -198,91 +128,8 @@ ${markdown}`
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
       .use(emoji)
-      .use(
-        htmlSchema.extendSchema((prev) => (ctx) => ({
-          ...prev(ctx),
-          toDOM: (node) => {
-            const span = document.createElement("span");
-            const attr = {
-              ...ctx.get(htmlAttr.key)(node),
-              "data-type": "html",
-              "data-value": node.attrs.value,
-            };
-            if (languages.html)
-              span.innerHTML = `<pre class="language-html"><code class="language-html">${highlight(node.attrs.value, languages.html, "html")}</code></pre>`;
-            else span.textContent = node.attrs.value;
-            return ["span", attr, span.firstElementChild];
-          },
-        })),
-      )
-      .use(
-        $prose(
-          (ctx) =>
-            new Plugin({
-              key,
-              props: {
-                decorations: (state) => key.getState(state).deco,
-                handleKeyDown(view, event) {
-                  const { dispatch, state } = view,
-                    { message } = key.getState(state),
-                    { schema, tr } = state;
-                  const { content } = ctx.get(parserCtx)(message);
-
-                  dispatch(tr.setMeta(key, ""));
-                  if (event.key === "Tab" && message) {
-                    event.preventDefault();
-                    dispatch(
-                      tr.replaceSelection(
-                        DOMParser.fromSchema(schema).parseSlice(
-                          DOMSerializer.fromSchema(schema).serializeFragment(
-                            content,
-                          ),
-                        ),
-                      ),
-                    );
-                    return true;
-                  } else {
-                    if (event.key === "Enter" || event.key.length === 1)
-                      getHint(ctx, view);
-                    else getHint.cancel();
-                  }
-                },
-              },
-              state: {
-                apply(tr, value, prevState, { doc, schema }) {
-                  const message = tr.getMeta(key),
-                    { content } = ctx.get(parserCtx)(message),
-                    {
-                      selection: {
-                        $anchor: { parentOffset },
-                        to,
-                      },
-                    } = tr;
-                  return typeof message === "string"
-                    ? {
-                        deco: message.length
-                          ? DecorationSet.create(doc, [
-                              Decoration.widget(
-                                to + Number(!parentOffset),
-                                DOMSerializer.fromSchema(
-                                  schema,
-                                ).serializeFragment(
-                                  content,
-                                  {},
-                                  document.createElement("pre"),
-                                ),
-                              ),
-                            ])
-                          : DecorationSet.empty,
-                        message,
-                      }
-                    : value;
-                },
-                init,
-              },
-            }),
-        ),
-      );
+      .use(htmlSchemaExtended)
+      .use(copilotPlugin);
 
     return crepe;
   });
@@ -297,16 +144,6 @@ watch(
   () => $q.dark.isActive,
   (value) => {
     css.value = value ? darkTheme : lightTheme;
-  },
-  { immediate },
-);
-
-watch(
-  apiKey,
-  (value) => {
-    copilot = value
-      ? new CompletionCopilot(value, { model, provider })
-      : undefined;
   },
   { immediate },
 );
