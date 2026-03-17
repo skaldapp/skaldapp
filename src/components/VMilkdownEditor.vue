@@ -4,6 +4,7 @@ Milkdown
 
 <script setup lang="ts">
 import type { Ctx } from "@milkdown/kit/ctx";
+import type { Handle } from "mdast-util-to-markdown";
 import type { EditorView } from "prosemirror-view";
 
 import { Crepe } from "@milkdown/crepe";
@@ -46,6 +47,13 @@ const $q = useQuasar(),
   blockCaptionPlaceholderText = "Write Image Title",
   dataStore = useDataStore(),
   deco = DecorationSet.empty,
+  link: Handle = (node, parent, state, info) =>
+    ((text) =>
+      text === node.url ? node.url : `[${text}](${node.url as string})`)(
+      state.containerPhrasing(node, info),
+    ),
+  text: Handle = ({ value }) => value,
+  handlers = { link, text },
   ioStore = useIoStore(),
   key = new PluginKey("MilkdownCopilot"),
   language = "markdown",
@@ -187,9 +195,7 @@ ${markdown}`
         });
       })
       .editor.config((ctx) => {
-        ctx.set(remarkStringifyOptionsCtx, {
-          handlers: { text: ({ value }) => value },
-        });
+        ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
       .use(emoji)
       .use(
