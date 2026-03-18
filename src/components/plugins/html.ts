@@ -7,6 +7,7 @@ export const htmlSchemaExtended = htmlSchema.extendSchema((prev) => (ctx) => ({
     const span = document.createElement("span");
     const attr = {
       ...ctx.get(htmlAttr.key)(node),
+      class: "inline-block",
       "data-type": "html",
       "data-value": node.attrs.value,
     };
