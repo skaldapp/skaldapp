@@ -11,7 +11,7 @@ export const htmlSchemaExtended = htmlSchema.extendSchema((prev) => (ctx) => ({
       "data-value": node.attrs.value,
     };
     if (languages.html)
-      span.innerHTML = `<pre class="language-html"><code class="language-html">${highlight(node.attrs.value, languages.html, "html")}</code></pre>`;
+      span.innerHTML = `<code class="language-html">${highlight(node.attrs.value, languages.html, "html")}</code>`;
     else span.textContent = node.attrs.value;
     return ["span", attr, span.firstElementChild];
   },
