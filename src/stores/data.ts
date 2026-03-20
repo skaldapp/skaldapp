@@ -176,7 +176,7 @@ ${headTags}`,
         "sitemap.txt",
         domain.value
           ? $nodes.value
-              .filter((node) => !isRedirect(node))
+              .filter(({ branch }) => !isRedirect(branch))
               .map(
                 ({ path }) =>
                   path !== undefined &&
