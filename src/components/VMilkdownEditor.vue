@@ -3,13 +3,16 @@ Milkdown
 </template>
 
 <script setup lang="ts">
+// import type { RemarkPluginRaw } from "@milkdown/transformer";
 import type { Handle } from "mdast-util-to-markdown";
+// import type { RemarkMDCOptions } from "remark-mdc";
 
 import { Crepe } from "@milkdown/crepe";
 import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
 import { remarkStringifyOptionsCtx } from "@milkdown/kit/core";
 import { htmlSchema } from "@milkdown/kit/preset/commonmark";
+// import { $remark } from "@milkdown/kit/utils";
 import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
@@ -19,6 +22,7 @@ import { htmlSchemaExtended } from "components/plugins/html";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
+// import remarkMDC from "remark-mdc";
 import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent } from "stores/defaults";
 import { useIoStore } from "stores/io";
@@ -127,6 +131,12 @@ ${markdown}`
       .editor.config((ctx) => {
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
+      // .use(
+      //   $remark(
+      //     "remarkMDC",
+      //     () => remarkMDC as RemarkPluginRaw<RemarkMDCOptions>,
+      //   ),
+      // )
       .use(emoji)
       .use(htmlSchemaExtended)
       .use(copilotPlugin);
