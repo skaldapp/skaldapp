@@ -13,13 +13,15 @@ import { Crepe } from "@milkdown/crepe";
 import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
 import { remarkStringifyOptionsCtx } from "@milkdown/kit/core";
-import { htmlSchema } from "@milkdown/kit/preset/commonmark";
 import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
+import { htmlSchemaExtended } from "@skaldapp/milkdown-nodes";
 import { useStyleTag } from "@vueuse/core";
-import { copilotPlugin } from "components/plugins/copilotPlugin";
-import { htmlSchemaExtended } from "components/plugins/html";
+import {
+  copilotPlugin,
+  copilotPluginCtx,
+} from "components/plugins/copilotPlugin";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
@@ -44,10 +46,10 @@ const $q = useQuasar(),
   mainStore = useMainStore(),
   urls = new Map(),
   yaml = "---",
+  { apiKey, selected } = storeToRefs(mainStore),
   { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
   { getModel } = dataStore,
   { getObjectBlob, headObject, putObject } = ioStore,
-  { selected } = storeToRefs(mainStore),
   { t } = useI18n();
 
 let front = "",
@@ -112,8 +114,6 @@ const clearUrls = () => {
     const defaultValue = getValue(),
       crepe = new Crepe({ defaultValue, featureConfigs, root });
 
-    void crepe.editor.remove(htmlSchema);
-
     crepe
       .on((api) => {
         api.markdownUpdated((ctx, markdown) => {
@@ -129,6 +129,7 @@ ${markdown}`
         });
       })
       .editor.config((ctx) => {
+        ctx.set(copilotPluginCtx, apiKey.value);
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
       // .use(
@@ -157,6 +158,12 @@ watch(
   },
   { immediate },
 );
+
+watch(apiKey, (value) => {
+  get()?.action((ctx) => {
+    ctx.set(copilotPluginCtx, value);
+  });
+});
 
 onUnmounted(clearUrls);
 </script>
