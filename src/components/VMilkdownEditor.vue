@@ -16,12 +16,13 @@ import { remarkStringifyOptionsCtx } from "@milkdown/kit/core";
 import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
+import {
+  apiKeySlice,
+  copilotPlugin,
+  filenameSlice,
+} from "@skaldapp/milkdown-copilot";
 import { htmlSchemaExtended } from "@skaldapp/milkdown-nodes";
 import { useStyleTag } from "@vueuse/core";
-import {
-  copilotPlugin,
-  copilotPluginCtx,
-} from "components/plugins/copilotPlugin";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
@@ -129,7 +130,8 @@ ${markdown}`
         });
       })
       .editor.config((ctx) => {
-        ctx.set(copilotPluginCtx, apiKey.value);
+        ctx.set(apiKeySlice, apiKey.value);
+        ctx.set(filenameSlice, `${selected.value}.md`);
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
       // .use(
@@ -149,6 +151,9 @@ watch(selected, async (value) => {
   textModel = await getModel(value);
   clearUrls();
   get()?.action(replaceAll(getValue(), true));
+  get()?.action((ctx) => {
+    ctx.set(filenameSlice, `${value}.md`);
+  });
 });
 
 watch(
@@ -161,7 +166,7 @@ watch(
 
 watch(apiKey, (value) => {
   get()?.action((ctx) => {
-    ctx.set(copilotPluginCtx, value);
+    ctx.set(apiKeySlice, value);
   });
 });
 
