@@ -57,7 +57,7 @@
     "@skaldapp/fsa": "^1.0.51",
     "@skaldapp/milkdown-copilot": "^0.0.4",
     "@skaldapp/milkdown-nodes": "^0.1.7",
-    "@skaldapp/monaco-sfc": "^1.1.27",
+    "@skaldapp/monaco-sfc": "^1.1.28",
     "@skaldapp/shared": "^1.2.61",
     "@smithy/fetch-http-handler": "^5.3.15",
     "@unhead/vue": "^2.1.12",
