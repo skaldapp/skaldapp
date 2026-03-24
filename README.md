@@ -1,15 +1,14 @@
 # Skald
 
-Skald is an open-source browser-based Vue.js web editor that allows creating static websites with Vue SFCs without Node.js setup. Features runtime SFC compilation, Monaco editor, WYSIWYG mode, Tailwind CSS, and multiple storage options.
+**Skald** is an open-source, browser-based Vue.js web editor that enables creating static websites with Vue Single-File Components (SFCs) without requiring a Node.js setup. The application features runtime SFC compilation, Monaco editor integration, WYSIWYG mode, Tailwind CSS / UnoCSS support, multiple storage options, and Electron desktop app capabilities.
 
 ## Table of Contents
 
 - [Features](#features)
+- [Technology Stack](#technology-stack)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Architecture](#architecture)
-- [Storage Options](#storage-options)
-- [AI Integration](#ai-integration)
+- [Project Structure](#project-structure)
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
@@ -19,18 +18,36 @@ Skald is an open-source browser-based Vue.js web editor that allows creating sta
 - **Browser-based editing**: No need to install Node.js or any other dependencies
 - **Runtime SFC compilation**: Edit Vue Single File Components directly in the browser
 - **Dual editing modes**: Switch between WYSIWYG editor (using Milkdown) and Markdown editor (using Monaco)
-- **Multiple storage options**: Store content locally via File System Access API or remotely via S3-compatible services
-- **AI integration**: Integrated with Mistral AI for enhanced editing capabilities
-- **Internationalization**: Built-in support for multiple languages (currently English and Russian)
-- **Electron support**: Can be packaged as a desktop application
-- **SEO-friendly**: Automatic sitemap generation and SEO metadata management
+- **Multiple storage options**: Store content locally via File System Access API (@skaldapp/fsa) or remotely via S3-compatible services
+- **AI integration**: Integrated with Mistral AI (via AI SDK) for enhanced editing capabilities
+- **Internationalization**: Built-in support for multiple languages (English en-US, Russian ru-RU)
+- **Electron desktop app**: Cross-platform desktop application with auto-update support
+- **SEO-friendly**: Automatic sitemap generation and SEO metadata management with Unhead
 - **Customizable themes**: Light/dark mode support with UnoCSS styling
+- **Frontmatter support**: YAML frontmatter for page metadata
+
+## Technology Stack
+
+| Category             | Technologies                      |
+| -------------------- | --------------------------------- |
+| **Framework**        | Vue 3.5+, Quasar Framework 2.18+  |
+| **Build Tool**       | Vite 7+, Quasar App Vite          |
+| **Language**         | TypeScript (strict mode)          |
+| **State Management** | Pinia 3+                          |
+| **Routing**          | Vue Router 5+                     |
+| **Editor**           | Monaco Editor 0.52.2              |
+| **Markdown**         | Milkdown 7.19+                    |
+| **CSS**              | UnoCSS 66+, Tailwind CSS, PostCSS |
+| **Desktop**          | Electron 40+, @electron/remote    |
+| **Storage**          | @skaldapp/fsa, AWS SDK v3         |
+| **AI**               | AI SDK (Mistral, Vue integration) |
+| **i18n**             | Vue I18n 11+                      |
 
 ## Installation
 
 ### Prerequisites
 
-- Node.js (for development/building)
+- Node.js 18+ (for development/building)
 - npm or yarn
 
 ### Development Setup
@@ -61,21 +78,21 @@ npm run build:electron
 
 ### Getting Started
 
-1. Open the application in your browser
+1. Open the application in your browser (or run as Electron desktop app)
 2. Choose a storage option (local filesystem or S3-compatible service)
 3. Create pages using the tree structure
-4. Edit content using either the WYSIWYG editor or Markdown editor
+4. Edit content using either the WYSIWYG editor or Monaco editor
 5. Publish your site with custom domain support
 
 ### Storage Options
 
-- **Local File System**: Use the browser's File System Access API to store files locally
+- **Local File System**: Use the browser's File System Access API (@skaldapp/fsa) to store files locally
 - **S3-Compatible Services**: Connect to AWS S3 or other S3-compatible storage providers
 - **Electron**: When running as a desktop app, files are stored locally
 
 ### AI Integration
 
-Skald integrates with Mistral AI to provide:
+Skald integrates with Mistral AI via the AI SDK to provide:
 
 - Smart completions in the Monaco editor
 - AI-powered content suggestions in the WYSIWYG editor
@@ -103,100 +120,90 @@ icon: twemoji:page-facing-up
 ---
 ```
 
-## Architecture
-
-### Core Technologies
-
-- **Vue 3**: Progressive JavaScript framework with Composition API
-- **Quasar**: Full-featured Vue.js framework for responsive apps
-- **Monaco Editor**: Microsoft's web-based code editor
-- **Milkdown**: Modern and customizable WYSIWYG editor
-- **UnoCSS**: Instant on-demand atomic CSS engine
-- **Pinia**: Intuitive store for Vue applications
-- **Vite**: Fast build tool with hot module replacement
-
-### Project Structure
+## Project Structure
 
 ```
-src/
-├── components/          # Reusable Vue components
-│   ├── dialogs/         # Modal dialog components
-│   └── VAiChat.vue      # AI chat interface
-├── layouts/             # Application layouts
-├── pages/               # Route components
-├── stores/              # Pinia stores for state management
-├── assets/              # Static assets
-├── boot/                # Application boot files
-└── i18n/                # Internationalization files
+skaldapp/
+├── src/                    # Main Vue application source
+│   ├── boot/               # Boot files (main, route, i18n, monaco)
+│   ├── components/         # Vue components
+│   │   ├── dialogs/        # Modal dialog components
+│   │   └── VAiChat.vue     # AI chat interface
+│   ├── css/                # Global CSS/SCSS
+│   ├── i18n/               # Internationalization files
+│   ├── layouts/            # Layout components
+│   ├── pages/              # Page components
+│   ├── router/             # Router configuration
+│   ├── stores/             # Pinia stores
+│   │   ├── data.ts         # Page/data management with SEO meta handling
+│   │   ├── io.ts           # File I/O operations via @skaldapp/fsa
+│   │   ├── s3.ts           # S3 storage integration
+│   │   ├── main.ts         # UI state and user preferences
+│   │   └── defaults.ts     # Default values and constants
+│   └── App.vue             # Root component
+├── src-electron/           # Electron main process code
+│   ├── electron-main.ts    # Electron main entry
+│   └── electron-preload.ts # Preload script
+├── public/                 # Static assets (favicons)
+├── runtime/                # Build output directory
+├── quasar.config.ts        # Quasar framework configuration
+├── package.json            # Dependencies and scripts
+├── tsconfig.json           # TypeScript configuration
+├── eslint.config.ts        # ESLint configuration (flat config)
+├── uno.config.ts           # UnoCSS configuration
+└── release-notes.md        # Release notes
 ```
 
 ### State Management
 
-The application uses Pinia for state management with three main stores:
+The application uses Pinia for state management with the following stores:
 
-- **data store**: Manages page content and metadata
-- **main store**: Handles UI state and user preferences
-- **io store**: Manages data persistence and storage operations
-- **s3 store**: Handles S3-compatible storage operations
+- **data store** (`data.ts`): Manages page content, metadata, and SEO meta handling
+- **io store** (`io.ts`): Handles file I/O operations via @skaldapp/fsa
+- **s3 store** (`s3.ts`): Handles S3-compatible storage operations
+- **main store** (`main.ts`): Manages UI state and user preferences
+- **defaults store** (`defaults.ts`): Provides default values and constants
 
-### Data Flow
+### Architecture Patterns
 
-1. User creates/edit content through UI
-2. Changes are saved to Monaco editor models
-3. Models are persisted to storage (local or remote)
-4. HTML pages are generated from Markdown content
-5. SEO metadata is applied using Unhead
-
-## Storage Options
-
-### Local Storage
-
-- Uses the browser's File System Access API
-- Stores content as Markdown files
-- Generates static HTML pages
-- Supports custom domains via CNAME file
-
-### Remote Storage (S3 Compatible)
-
-- Connect to AWS S3 or compatible services
-- Secure credential management with encryption
-- Supports multiple accounts
-- Pin protection for sensitive credentials
-
-## AI Integration
-
-### Mistral AI
-
-The application integrates with Mistral AI for:
-
-- Code completion in the Monaco editor
-- Content suggestions in the WYSIWYG editor
-- AI chat interface for content creation
-
-### Setting Up AI
-
-1. Obtain a Mistral API key from [Mistral Console](https://console.mistral.ai/api-keys)
-2. Navigate to the AI settings in the application
-3. Enter your API key
-4. AI features will be enabled throughout the application
+1. **Composition API**: All Vue components use `<script setup>` with Composition API
+2. **Monaco Editor**: Custom Monaco SFC integration for Vue file editing
+3. **File System**: Uses @skaldapp/fsa for File System Access API with multiple storage backends (S3, local)
+4. **Electron Integration**:
+   - Main process in `src-electron/electron-main.ts`
+   - Uses `@electron/remote` for renderer-main communication
+   - DevTools disabled in production
+5. **SEO**: Automatic meta tags inferred using `InferSeoMetaPlugin` from Unhead
 
 ## Development
 
 ### Available Scripts
 
-- `npm run dev`: Start development server
-- `npm run build`: Build for production
-- `npm run dev:electron`: Start Electron development
-- `npm run build:electron`: Build Electron application
-- `npm run lint`: Run ESLint
+| Command                  | Description                                  |
+| ------------------------ | -------------------------------------------- |
+| `npm run dev`            | Start development server                     |
+| `npm run build`          | Build for production (web)                   |
+| `npm run dev:electron`   | Start Electron development                   |
+| `npm run build:electron` | Build Electron application                   |
+| `npm run lint`           | Run ESLint                                   |
+| `npm install`            | Install dependencies (runs `quasar prepare`) |
 
 ### Environment Configuration
 
 The application uses Vite for building and development. Configuration is handled in:
 
-- `vite.config.ts`: Vite configuration
-- `quasar.config.ts`: Quasar-specific configuration
+- `quasar.config.ts`: Quasar framework configuration with Vite extensions
+- `tsconfig.json`: TypeScript configuration (strict mode enabled)
 - `uno.config.ts`: UnoCSS configuration
+- `eslint.config.ts`: ESLint flat configuration
+
+### Code Style
+
+- **Indentation**: 2 spaces (see `.editorconfig`)
+- **Line ending**: LF
+- **Charset**: UTF-8
+- **Final newline**: Required
+- **Trailing whitespace**: Trimmed
 
 ### Internationalization
 
@@ -217,15 +224,16 @@ The application supports multiple languages:
 
 ### Development Guidelines
 
-- Follow Vue 3 Composition API best practices
-- Use TypeScript for type safety
-- Maintain consistent code style (ESLint/Prettier configured)
-- Write clear commit messages
+- Follow Vue 3 Composition API best practices with `<script setup>`
+- Use TypeScript with strict mode for type safety
+- Maintain consistent code style (ESLint flat config)
+- Write clear commit messages following conventional commits
 - Update documentation as needed
+- Test changes in both web and Electron modes
 
 ## License
 
-This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the AGPL-3.0-or-later License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
@@ -234,3 +242,8 @@ This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE)
 - Monaco Editor team for the powerful code editor
 - Milkdown team for the modern WYSIWYG editor
 - All contributors who help improve Skald
+
+---
+
+**Repository**: [github.com/skaldapp/skaldapp](https://github.com/skaldapp/skaldapp)  
+**Author**: Jerry Bruwes <jbruwes@gmail.com>
