@@ -53,6 +53,7 @@
     "@milkdown/plugin-emoji": "^7.19.2",
     "@milkdown/utils": "^7.19.2",
     "@milkdown/vue": "^7.19.2",
+    "@nuxtlabs/monarch-mdc": "^0.9.0",
     "@quasar/app-vite": "^2.5.4",
     "@skaldapp/fsa": "^1.0.51",
     "@skaldapp/milkdown-copilot": "^0.0.4",

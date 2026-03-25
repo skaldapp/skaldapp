@@ -8,6 +8,7 @@ import type {
   CompletionRequestBody,
 } from "monacopilot";
 
+import { registerBracketMatcher } from "@nuxtlabs/monarch-mdc";
 import { split } from "hexo-front-matter";
 import * as monaco from "monaco-editor";
 import { CompletionCopilot, registerCompletion } from "monacopilot";
@@ -18,7 +19,8 @@ import { enabled, immediate, technologies } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
 
-let completion: CompletionRegistration | null = null,
+let bracketMatcherDisposable: monaco.IDisposable | null = null,
+  completion: CompletionRegistration | null = null,
   editor: monaco.editor.IStandaloneCodeEditor | null = null,
   model: monaco.editor.ITextModel | null = null;
 
@@ -42,6 +44,7 @@ const $q = useQuasar(),
   startLineNumber = 2,
   tabSize = 2,
   unicodeHighlight = { ambiguousCharacters },
+  wordWrap = "on",
   { apiKey, selected } = storeToRefs(mainStore),
   { getModel } = dataStore,
   { message } = storeToRefs(dataStore);
@@ -118,7 +121,9 @@ onMounted(() => {
             scrollBeyondLastLine,
             tabSize,
             unicodeHighlight,
+            wordWrap,
           });
+        bracketMatcherDisposable = registerBracketMatcher(editor);
         monacopilot(apiKey.value);
         frontmatter(message.value);
       }
@@ -131,6 +136,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   completion?.deregister();
   completion = null;
+  bracketMatcherDisposable?.dispose();
   editor?.dispose();
   editor = null;
 });
