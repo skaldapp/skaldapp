@@ -14,12 +14,11 @@ q-layout(view="hHh LpR lff", @keyup.esc="rightDrawer = false")
         :class="{ invisible: bucket && $q.screen.lt.sm }"
       )
         | SK
-        q-icon.align-text-bottom(
-          v-if="$q.dark.isActive",
-          name="img:favicon-dark.svg",
-          size="md"
+        q-icon.q-mx-xs.vertical-top(
+          :name="fasMountain",
+          size="sm",
+          style="margin-top: 1px"
         )
-        q-icon.align-text-bottom(v-else, name="img:favicon.svg", size="md")
         | LD
       q-chip.q-mx-md(
         v-if="bucket",
@@ -46,6 +45,7 @@ q-layout(view="hHh LpR lff", @keyup.esc="rightDrawer = false")
 </template>
 
 <script setup lang="ts">
+import { fasMountain } from "@quasar/extras/fontawesome-v6";
 import VMainMenu from "components/VMainMenu.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
