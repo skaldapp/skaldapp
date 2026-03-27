@@ -4,7 +4,9 @@ on:
     tags:
       - "v*.*.*"
 jobs:
-  changelog:
+  release:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -16,13 +18,16 @@ jobs:
           args: --latest
         env:
           OUTPUT: release-notes.md
+      - uses: ncipollo/release-action@v1
+        with:
+          bodyFile: "release-notes.md"
       - uses: actions/upload-artifact@v7
         with:
           name: release-notes
           path: release-notes.md
           retention-days: 1
   build:
-    needs: changelog
+    needs: release
     permissions:
       contents: write
     runs-on: ${{ matrix.os }}
