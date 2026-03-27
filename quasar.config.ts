@@ -1,4 +1,6 @@
 import { defineConfig } from "#q-app/wrappers";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import { fileURLToPath } from "url";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
@@ -29,7 +31,11 @@ const alias = { "node:path": "path-browserify" },
   include = [fileURLToPath(new URL("./src/i18n", import.meta.url))],
   preloadScripts = ["electron-preload"],
   releaseNotesFile = "release-notes.md",
-  releaseInfo = { releaseNotesFile },
+  releaseNotes = readFileSync(
+    resolve(process.cwd(), releaseNotesFile),
+    "utf-8",
+  ),
+  releaseInfo = { releaseNotes, releaseNotesFile },
   releaseType = "release",
   stripBase = 4,
   rename = { stripBase },
