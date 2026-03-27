@@ -13,7 +13,7 @@ jobs:
           fetch-tags: true
       - uses: orhun/git-cliff-action@v4
         with:
-          args: --latest --config github --unconventional
+          args: --latest --config github --include-unconventional
         env:
           OUTPUT: release-notes.md
       - uses: actions/upload-artifact@v7
