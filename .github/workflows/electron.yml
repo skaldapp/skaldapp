@@ -37,7 +37,6 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           name: release-notes
-          path: public
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
