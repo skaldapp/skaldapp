@@ -1,5 +1,5 @@
 import { enable, initialize } from "@electron/remote/main/index.js";
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, screen } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -17,11 +17,13 @@ const currentDir = fileURLToPath(new URL(".", import.meta.url)),
   ),
   sandbox = false,
   show = false,
-  webPreferences = { devTools, preload, sandbox },
-  width = 1000;
+  webPreferences = { devTools, preload, sandbox };
 
 const createWindow = async () => {
-  mainWindow = new BrowserWindow({ icon, show, webPreferences, width });
+  const {
+    workAreaSize: { height, width },
+  } = screen.getPrimaryDisplay();
+  mainWindow = new BrowserWindow({ height, icon, show, webPreferences, width });
   enable(mainWindow.webContents);
   if (process.env.DEV) await mainWindow.loadURL(process.env.APP_URL);
   else await mainWindow.loadFile("index.html");
