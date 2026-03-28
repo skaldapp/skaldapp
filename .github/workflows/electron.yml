@@ -45,7 +45,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: "npm"
       - run: npm ci
       - if: matrix.os == 'ubuntu-latest'
         run: sudo snap install snapcraft --classic
