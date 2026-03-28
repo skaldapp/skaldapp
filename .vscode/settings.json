@@ -8,5 +8,8 @@
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "terminal.integrated.enablePersistentSessions": false,
   "git.followTagsWhenSync": true,
-  "cSpell.language": "en,ru"
+  "cSpell.language": "en,ru",
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
