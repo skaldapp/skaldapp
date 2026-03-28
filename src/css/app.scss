@@ -45,6 +45,12 @@ a:hover {
   background-color: $nord0;
 }
 
+/* Fix for virtual cursor rendering issue in Electron on Windows */
+.ProseMirror-focused .prosemirror-virtual-cursor-animation {
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
 .q-chip--dark {
   background-color: $nord9;
 }
