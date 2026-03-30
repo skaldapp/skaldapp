@@ -46,9 +46,9 @@ a:hover {
 }
 
 /* Fix for virtual cursor rendering issue in Electron on Windows */
-.ProseMirror-focused .prosemirror-virtual-cursor-animation {
-  will-change: opacity;
-  transform: translateZ(0);
+.ProseMirror,
+.monaco-editor {
+  cursor: auto !important;
 }
 
 .q-chip--dark {
