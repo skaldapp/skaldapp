@@ -17,29 +17,13 @@ const currentDir = fileURLToPath(new URL(".", import.meta.url)),
   ),
   sandbox = false,
   show = false,
-  webPreferences = {
-    backgroundThrottling: false, // Fix for virtual cursor rendering issue in Electron on Windows
-    devTools,
-    offscreen: false, // Fix for virtual cursor rendering issue in Electron on Windows
-    preload,
-    sandbox,
-  };
+  webPreferences = { devTools, preload, sandbox };
 
 const createWindow = async () => {
   const {
     workAreaSize: { height, width },
   } = screen.getPrimaryDisplay();
-  mainWindow = new BrowserWindow({
-    backgroundColor: "#FFFFFF", // Fix for virtual cursor rendering issue in Electron on Windows
-    frame: true, // Fix for virtual cursor rendering issue in Electron on Windows
-    height,
-    icon,
-    show,
-    transparent: false, // Fix for virtual cursor rendering issue in Electron on Windows
-    visualEffectState: "inactive", // Fix for virtual cursor rendering issue in Electron on Windows
-    webPreferences,
-    width,
-  });
+  mainWindow = new BrowserWindow({ height, icon, show, webPreferences, width });
   enable(mainWindow.webContents);
   if (process.env.DEV) await mainWindow.loadURL(process.env.APP_URL);
   else await mainWindow.loadFile("index.html");
@@ -52,14 +36,11 @@ const createWindow = async () => {
 initialize();
 Menu.setApplicationMenu(null);
 
-/* Fix for virtual cursor rendering issue in Electron on Windows */
-/*
 if (process.platform === "win32") {
   app.commandLine.appendSwitch("disable-direct-composition");
-  app.commandLine.appendSwitch("use-angle", "d3d11");
-  app.commandLine.appendSwitch("force-color-profile", "srgb");
+  // app.commandLine.appendSwitch("use-angle", "d3d11");
+  // app.commandLine.appendSwitch("force-color-profile", "srgb");
 }
-*/
 
 void app.whenReady().then(createWindow);
 app.on("window-all-closed", () => {

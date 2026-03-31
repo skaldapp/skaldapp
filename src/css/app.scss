@@ -45,12 +45,6 @@ a:hover {
   background-color: $nord0;
 }
 
-/* Fix for virtual cursor rendering issue in Electron on Windows */
-.ProseMirror,
-.monaco-editor {
-  cursor: auto !important;
-}
-
 .q-chip--dark {
   background-color: $nord9;
 }
