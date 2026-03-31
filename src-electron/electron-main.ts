@@ -53,11 +53,13 @@ initialize();
 Menu.setApplicationMenu(null);
 
 /* Fix for virtual cursor rendering issue in Electron on Windows */
+/*
 if (process.platform === "win32") {
   app.commandLine.appendSwitch("disable-direct-composition");
   app.commandLine.appendSwitch("use-angle", "d3d11");
   app.commandLine.appendSwitch("force-color-profile", "srgb");
 }
+*/
 
 void app.whenReady().then(createWindow);
 app.on("window-all-closed", () => {
