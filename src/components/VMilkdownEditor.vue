@@ -4,15 +4,12 @@ Milkdown
 
 <script setup lang="ts">
 import type { Handle } from "mdast-util-to-markdown";
-// import type { RemarkPluginRaw } from "@milkdown/transformer";
-// import type { RemarkMDCOptions } from "remark-mdc";
-// import { $remark } from "@milkdown/kit/utils";
-// import remarkMDC from "remark-mdc";
 
 import { Crepe } from "@milkdown/crepe";
 import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
 import { remarkStringifyOptionsCtx } from "@milkdown/kit/core";
+import { htmlAttr, htmlSchema } from "@milkdown/kit/preset/commonmark";
 import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
@@ -21,10 +18,10 @@ import {
   copilotPlugin,
   filenameSlice,
 } from "@skaldapp/milkdown-copilot";
-import { htmlSchemaExtended } from "@skaldapp/milkdown-nodes";
 import { useStyleTag } from "@vueuse/core";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
+import { highlight, languages } from "prismjs";
 import { useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent } from "stores/defaults";
@@ -134,14 +131,25 @@ ${markdown}`
         ctx.set(filenameSlice, `${selected.value}.md`);
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
-      // .use(
-      //   $remark(
-      //     "remarkMDC",
-      //     () => remarkMDC as RemarkPluginRaw<RemarkMDCOptions>,
-      //   ),
-      // )
       .use(emoji)
-      .use(htmlSchemaExtended)
+      .use(
+        htmlSchema.extendSchema((prev) => (ctx) => ({
+          ...prev(ctx),
+          toDOM: (node) => {
+            const span = document.createElement("span");
+            const attr = {
+              ...ctx.get(htmlAttr.key)(node),
+              class: "inline-block",
+              "data-type": "html",
+              "data-value": node.attrs.value,
+            };
+            if (languages.html)
+              span.innerHTML = `<code class="language-html">${highlight(node.attrs.value, languages.html, "html")}</code>`;
+            else span.textContent = node.attrs.value;
+            return ["span", attr, span.firstElementChild];
+          },
+        })),
+      )
       .use(copilotPlugin);
 
     return crepe;
