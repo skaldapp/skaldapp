@@ -36,7 +36,7 @@ const createWindow = async () => {
 initialize();
 Menu.setApplicationMenu(null);
 if (process.platform === "win32")
-  app.commandLine.appendSwitch("disable-direct-composition-video-overlay");
+  app.commandLine.appendSwitch("disable-direct-composition");
 void app.whenReady().then(createWindow);
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
