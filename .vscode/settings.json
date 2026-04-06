@@ -11,5 +11,11 @@
   "cSpell.language": "en,ru",
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "Codegeex.RepoIndex": true,
+  "Codegeex.CommitMessage.LanguagePreference": "English",
+  "Codegeex.Chat.LanguagePreference": "English",
+  "Codegeex.Comment.LanguagePreference": "English",
+  "Codegeex.SidebarUI.LanguagePreference": "English",
+  "Codegeex.CommitMessageStyle": "ConventionalCommits"
 }
