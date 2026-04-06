@@ -56,7 +56,7 @@
     "@nuxtlabs/monarch-mdc": "^0.9.0",
     "@quasar/app-vite": "^2.6.0",
     "@quasar/extras": "^1.18.0",
-    "@skaldapp/fsa": "^1.0.57",
+    "@skaldapp/fsa": "^1.1.0",
     "@skaldapp/milkdown-copilot": "^0.0.12",
     "@skaldapp/monaco-sfc": "^1.1.33",
     "@skaldapp/shared": "^1.2.67",
@@ -111,7 +111,7 @@
     "electron-builder": "^26.8.1",
     "eslint": "^9.39.4",
     "nord": "^0.2.1",
-    "vite": "^8.0.4",
+    "vite": "^8.0.5",
     "vite-plugin-checker": "^0.12.0",
     "vite-plugin-static-copy": "^4.0.1"
   },
