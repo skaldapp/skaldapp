@@ -1,4 +1,11 @@
-import type { StreamingBlobPayloadInputTypes } from "@smithy/types";
+import type {
+  DeleteObjectCommandInput,
+  GetObjectCommandInput,
+  GetObjectCommandOutput,
+  HeadObjectCommandInput,
+  PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
+import type { StreamingBlobPayloadOutputTypes } from "@smithy/types";
 
 import { dialog } from "@electron/remote";
 import { contextBridge } from "electron";
@@ -14,42 +21,47 @@ import {
 } from "fs/promises";
 import { basename, dirname, join } from "path";
 
-const deleteObject = async (Bucket: string, Key: string) => {
-    await unlink(join(Bucket, Key));
+const deleteObject = async ({ Bucket, Key }: DeleteObjectCommandInput) => {
+    if (Bucket !== undefined && Key !== undefined)
+      await unlink(join(Bucket, Key));
   },
-  getObject = async (Bucket: string, Key: string) => {
-    try {
-      const file = join(Bucket, Key);
-      const [body, mime] = await Promise.all([readFile(file), import("mime")]);
-      const type = mime.default.getType(file);
-      const headers = new Headers(type ? { "content-type": type } : undefined);
-      return new Response(body.buffer, { headers });
-    } catch {
-      return new Response();
+  getObject = async ({
+    Bucket,
+    Key,
+  }: GetObjectCommandInput): Promise<GetObjectCommandOutput> => {
+    const $metadata = {};
+    if (Bucket !== undefined && Key !== undefined) {
+      const [body, { default: mime }] = await Promise.all([
+          readFile(join(Bucket, Key)),
+          import("mime"),
+        ]),
+        Body = new Blob([body]) as StreamingBlobPayloadOutputTypes,
+        ContentType = mime.getType(Key) ?? undefined;
+      return {
+        $metadata,
+        Body,
+        ContentType,
+      };
+    } else return { $metadata };
+  },
+  headObject = async ({ Bucket, Key }: HeadObjectCommandInput) => {
+    if (Bucket !== undefined && Key !== undefined) {
+      const stats = await lstat(join(Bucket, Key));
+      if (stats.isFile()) return undefined;
     }
-  },
-  getObjectBlob = async (Bucket: string, Key: string) =>
-    (await getObject(Bucket, Key)).blob(),
-  getObjectText = async (Bucket: string, Key: string) =>
-    (await getObject(Bucket, Key)).text(),
-  headObject = async (Bucket: string, Key: string) => {
-    const stats = await lstat(join(Bucket, Key));
-    if (stats.isFile()) return undefined;
     throw new Error("It's not a file");
   },
-  putObject = async (
-    Bucket: string,
-    Key: string,
-    body: StreamingBlobPayloadInputTypes,
-  ) => {
-    const filePath = join(Bucket, Key);
-    const dirName = dirname(filePath);
-    try {
-      await access(dirName);
-    } catch {
-      await mkdir(dirName, { recursive: true });
+  putObject = async ({ Body, Bucket, Key }: PutObjectCommandInput) => {
+    if (Bucket !== undefined && Key !== undefined) {
+      const filePath = join(Bucket, Key),
+        dirName = dirname(filePath);
+      try {
+        await access(dirName);
+      } catch {
+        await mkdir(dirName, { recursive: true });
+      }
+      await writeFile(filePath, Body as string | Uint8Array);
     }
-    await writeFile(filePath, body as string | Uint8Array);
   },
   removeEmptyDirectories = async (directory: string, exclude: string[]) => {
     const fileStats = await lstat(directory);
@@ -70,8 +82,7 @@ const deleteObject = async (Bucket: string, Key: string) => {
 Object.entries({
   deleteObject,
   dialog,
-  getObjectBlob,
-  getObjectText,
+  getObject,
   headObject,
   putObject,
   removeEmptyDirectories,
