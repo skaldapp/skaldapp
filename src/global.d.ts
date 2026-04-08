@@ -1,23 +1,27 @@
-import type { StreamingBlobPayloadInputTypes } from "@smithy/types";
+import type {
+  DeleteObjectCommandInput,
+  GetObjectCommandInput,
+  GetObjectCommandOutput,
+  HeadObjectCommandInput,
+  PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
 import type { Dialog } from "electron";
 
 declare global {
   interface Window {
-    deleteObject: (Bucket: string, Key: string) => Promise<void>;
+    deleteObject: ({ Bucket, Key }: DeleteObjectCommandInput) => Promise<void>;
     dialog: Dialog;
     focusedWindowClose: () => void;
     focusedWindowIsMaximized: () => boolean | undefined;
     focusedWindowMinimize: () => void;
     focusedWindowToggleMaximize: () => void;
-    getObjectBlob: (Bucket: string, Key: string) => Promise<Blob>;
-    getObjectText: (Bucket: string, Key: string) => Promise<string>;
-    headObject: (Bucket: string, Key: string) => Promise<undefined>;
+    getObject: ({
+      Bucket,
+      Key,
+    }: GetObjectCommandInput) => Promise<GetObjectCommandOutput>;
+    headObject: ({ Bucket, Key }: HeadObjectCommandInput) => Promise<undefined>;
     MonacoEnvironment: Environment;
-    putObject: (
-      Bucket: string,
-      Key: string,
-      body: StreamingBlobPayloadInputTypes,
-    ) => Promise<void>;
+    putObject: ({ Body, Bucket, Key }: PutObjectCommandInput) => Promise<void>;
     removeEmptyDirectories: (
       directory: string,
       exclude?: string[],
