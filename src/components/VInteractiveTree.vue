@@ -110,7 +110,7 @@ const errors = [
 const cleaner = (value: TPage[]) => {
     value.forEach((page) => {
       const { children, id } = page;
-      if (children.length) cleaner(children as TPage[]);
+      if (children.length) cleaner(children);
       if (id) void deleteObject(`docs/${id}.md`);
     });
   },
