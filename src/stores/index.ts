@@ -1,7 +1,8 @@
-import { defineStore } from "#q-app/wrappers";
 import { Base64, Utf8 } from "crypto-es";
 import { createPinia } from "pinia";
 import { storePlugin } from "pinia-plugin-store";
+
+import { defineStore } from "#q-app/wrappers";
 
 const decrypt = (value: string): string => Base64.parse(value).toString(Utf8),
   encrypt = (value: string): string => Base64.stringify(Utf8.parse(value));
