@@ -1,6 +1,7 @@
-import { defineConfig } from "#q-app/wrappers";
 import { fileURLToPath } from "url";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+
+import { defineConfig } from "#q-app/wrappers";
 
 const alias = { "node:path": "path-browserify" },
   appId = "skald",
