@@ -2,7 +2,7 @@ import type { TPage } from "@skaldapp/shared";
 import type { SerializableHead } from "unhead/types";
 
 import { sharedStore } from "@skaldapp/shared";
-import { createHead, renderSSRHead } from "@unhead/vue/server";
+import { createHead } from "@unhead/vue/server";
 import { useFetch } from "@vueuse/core";
 import init from "assets/init.md?raw";
 import { parse } from "hexo-front-matter";
@@ -16,6 +16,7 @@ import {
   CanonicalPlugin,
   FlatMetaPlugin,
   InferSeoMetaPlugin,
+  MinifyPlugin,
   TemplateParamsPlugin,
 } from "unhead/plugins";
 import { ref, toRefs } from "vue";
@@ -104,6 +105,7 @@ export const useDataStore = defineStore("data", () => {
                     ]
                   : []),
                 InferSeoMetaPlugin(),
+                MinifyPlugin(),
               ],
             });
 
@@ -154,7 +156,7 @@ export const useDataStore = defineStore("data", () => {
           void (async () => {
             if (body.value)
               try {
-                const { headTags } = await renderSSRHead(vueHeadClient);
+                const { headTags } = vueHeadClient.render();
                 await putObject(
                   path ? `${path}/index.html` : "index.html",
                   body.value.replace(
