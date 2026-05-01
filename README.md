@@ -1,249 +1,189 @@
 # Skald
 
-**Skald** is an open-source, browser-based Vue.js web editor that enables creating static websites with Vue Single-File Components (SFCs) without requiring a Node.js setup. The application features runtime SFC compilation, Monaco editor integration, WYSIWYG mode, Tailwind CSS / UnoCSS support, multiple storage options, and Electron desktop app capabilities.
+**Skald** – a tree-structured content editor where thought finds structure
 
-## Table of Contents
+Create notes, articles, and knowledge bases in an intuitive visual editor. Publish the result with one click — or simply work locally. Complex tools are only invoked when you need them.
 
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Contributing](#contributing)
-- [License](#license)
+## 📥 Download
 
-## Features
+| Platform                | Link                                                             |
+| ----------------------- | ---------------------------------------------------------------- |
+| 🌐 **Web App**          | [Launch in browser](https://skaldapp.github.io/skaldapp)         |
+| 🪟 **Windows**          | [Download](https://github.com/skaldapp/skaldapp/releases/latest) |
+| 🍎 **macOS**            | [Download](https://github.com/skaldapp/skaldapp/releases/latest) |
+| 🐧 **Linux (AppImage)** | [Download](https://github.com/skaldapp/skaldapp/releases/latest) |
+| 🐧 **Ubuntu (Snap)**    | [Install from Snapcraft](https://snapcraft.io/skaldapp)          |
 
-- **Browser-based editing**: No need to install Node.js or any other dependencies
-- **Runtime SFC compilation**: Edit Vue Single File Components directly in the browser
-- **Dual editing modes**: Switch between WYSIWYG editor (using Milkdown) and Markdown editor (using Monaco)
-- **Multiple storage options**: Store content locally via File System Access API (@skaldapp/fsa) or remotely via S3-compatible services
-- **AI integration**: Integrated with Mistral AI (via AI SDK) for enhanced editing capabilities
-- **Internationalization**: Built-in support for multiple languages (English en-US, Russian ru-RU)
-- **Electron desktop app**: Cross-platform desktop application with auto-update support
-- **SEO-friendly**: Automatic sitemap generation and SEO metadata management with Unhead
-- **Customizable themes**: Light/dark mode support with UnoCSS styling
-- **Frontmatter support**: YAML frontmatter for page metadata
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://skaldapp.github.io/uploads/dark.png">
+<img alt="Skald" src="https://skaldapp.github.io/uploads/light.png">
+</picture>
 
-## Technology Stack
+## Content that lives in your structure
 
-| Category             | Technologies                      |
-| -------------------- | --------------------------------- |
-| **Framework**        | Vue 3.5+, Quasar Framework 2.18+  |
-| **Build Tool**       | Vite 7+, Quasar App Vite          |
-| **Language**         | TypeScript (strict mode)          |
-| **State Management** | Pinia 3+                          |
-| **Routing**          | Vue Router 5+                     |
-| **Editor**           | Monaco Editor 0.52.2              |
-| **Markdown**         | Milkdown 7.19+                    |
-| **CSS**              | UnoCSS 66+, Tailwind CSS, PostCSS |
-| **Desktop**          | Electron 40+, @electron/remote    |
-| **Storage**          | @skaldapp/fsa, AWS SDK v3         |
-| **AI**               | AI SDK (Mistral, Vue integration) |
-| **i18n**             | Vue I18n 11+                      |
+- 💻 **Work with a tree hierarchy** of documents in the way that suits you
 
-## Installation
+- ✍️ **The visual editor** hides technical details but leaves you in full control of formatting
 
-### Prerequisites
+- 🌐 **Build‑free publishing**: just copy the project folder to any hosting that supports static files
 
-- Node.js 18+ (for development/building)
-- npm or yarn
+- 🔁 **Lossless migration**: move content to another platform without complex conversions
 
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/skaldapp/skaldapp.git
-cd skaldapp
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-### Production Build
-
-```bash
-# Build for web
-npm run build
-
-# Build for Electron
-npm run build:electron
-```
-
-## Usage
-
-### Getting Started
-
-1. Open the application in your browser (or run as Electron desktop app)
-2. Choose a storage option (local filesystem or S3-compatible service)
-3. Create pages using the tree structure
-4. Edit content using either the WYSIWYG editor or Monaco editor
-5. Publish your site with custom domain support
-
-### Storage Options
-
-- **Local File System**: Use the browser's File System Access API (@skaldapp/fsa) to store files locally
-- **S3-Compatible Services**: Connect to AWS S3 or other S3-compatible storage providers
-- **Electron**: When running as a desktop app, files are stored locally
-
-### AI Integration
-
-Skald integrates with Mistral AI via the AI SDK to provide:
-
-- Smart completions in the Monaco editor
-- AI-powered content suggestions in the WYSIWYG editor
-- AI chat interface for content creation assistance
-
-To use AI features, you need to provide a Mistral API key in the settings.
-
-### Frontmatter Support
-
-Each page supports YAML frontmatter for metadata:
-
-```yaml
----
-title: Page Title
-description: Page Description
-attrs:
-  un-cloak: true
-  class:
-    - container
-    - mx-auto
-    - prose
-hidden: false
-template: false
-icon: twemoji:page-facing-up
----
-```
-
-## Project Structure
-
-```
-skaldapp/
-├── src/                    # Main Vue application source
-│   ├── boot/               # Boot files (main, route, i18n, monaco)
-│   ├── components/         # Vue components
-│   │   ├── dialogs/        # Modal dialog components
-│   │   └── VAiChat.vue     # AI chat interface
-│   ├── css/                # Global CSS/SCSS
-│   ├── i18n/               # Internationalization files
-│   ├── layouts/            # Layout components
-│   ├── pages/              # Page components
-│   ├── router/             # Router configuration
-│   ├── stores/             # Pinia stores
-│   │   ├── data.ts         # Page/data management with SEO meta handling
-│   │   ├── io.ts           # File I/O operations via @skaldapp/fsa
-│   │   ├── s3.ts           # S3 storage integration
-│   │   ├── main.ts         # UI state and user preferences
-│   │   └── defaults.ts     # Default values and constants
-│   └── App.vue             # Root component
-├── src-electron/           # Electron main process code
-│   ├── electron-main.ts    # Electron main entry
-│   └── electron-preload.ts # Preload script
-├── public/                 # Static assets (favicons)
-├── runtime/                # Build output directory
-├── quasar.config.ts        # Quasar framework configuration
-├── package.json            # Dependencies and scripts
-├── tsconfig.json           # TypeScript configuration
-├── eslint.config.ts        # ESLint configuration (flat config)
-├── uno.config.ts           # UnoCSS configuration
-└── release-notes.md        # Release notes
-```
-
-### State Management
-
-The application uses Pinia for state management with the following stores:
-
-- **data store** (`data.ts`): Manages page content, metadata, and SEO meta handling
-- **io store** (`io.ts`): Handles file I/O operations via @skaldapp/fsa
-- **s3 store** (`s3.ts`): Handles S3-compatible storage operations
-- **main store** (`main.ts`): Manages UI state and user preferences
-- **defaults store** (`defaults.ts`): Provides default values and constants
-
-### Architecture Patterns
-
-1. **Composition API**: All Vue components use `<script setup>` with Composition API
-2. **Monaco Editor**: Custom Monaco SFC integration for Vue file editing
-3. **File System**: Uses @skaldapp/fsa for File System Access API with multiple storage backends (S3, local)
-4. **Electron Integration**:
-   - Main process in `src-electron/electron-main.ts`
-   - Uses `@electron/remote` for renderer-main communication
-   - DevTools disabled in production
-5. **SEO**: Automatic meta tags inferred using `InferSeoMetaPlugin` from Unhead
-
-## Development
-
-### Available Scripts
-
-| Command                  | Description                                  |
-| ------------------------ | -------------------------------------------- |
-| `npm run dev`            | Start development server                     |
-| `npm run build`          | Build for production (web)                   |
-| `npm run dev:electron`   | Start Electron development                   |
-| `npm run build:electron` | Build Electron application                   |
-| `npm run lint`           | Run ESLint                                   |
-| `npm install`            | Install dependencies (runs `quasar prepare`) |
-
-### Environment Configuration
-
-The application uses Vite for building and development. Configuration is handled in:
-
-- `quasar.config.ts`: Quasar framework configuration with Vite extensions
-- `tsconfig.json`: TypeScript configuration (strict mode enabled)
-- `uno.config.ts`: UnoCSS configuration
-- `eslint.config.ts`: ESLint flat configuration
-
-### Code Style
-
-- **Indentation**: 2 spaces (see `.editorconfig`)
-- **Line ending**: LF
-- **Charset**: UTF-8
-- **Final newline**: Required
-- **Trailing whitespace**: Trimmed
-
-### Internationalization
-
-The application supports multiple languages:
-
-- English (en-US)
-- Russian (ru-RU)
-- Additional languages can be added in the `src/i18n` directory
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-### Development Guidelines
-
-- Follow Vue 3 Composition API best practices with `<script setup>`
-- Use TypeScript with strict mode for type safety
-- Maintain consistent code style (ESLint flat config)
-- Write clear commit messages following conventional commits
-- Update documentation as needed
-- Test changes in both web and Electron modes
-
-## License
-
-This project is licensed under the AGPL-3.0-or-later License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Vue.js team for the excellent framework
-- Quasar team for the comprehensive UI framework
-- Monaco Editor team for the powerful code editor
-- Milkdown team for the modern WYSIWYG editor
-- All contributors who help improve Skald
+> **Your content — your property**\
+> Skald doesn’t lock you into a platform. Your files are stored locally in standard formats (Markdown, JSON). Open formats mean freedom of choice today and content preservation tomorrow.
 
 ---
 
-**Repository**: [github.com/skaldapp/skaldapp](https://github.com/skaldapp/skaldapp)  
-**Author**: Jerry Bruwes <jbruwes@gmail.com>
+## Skald — for those who work with structured content
+
+If you work with hierarchical information — Skald is made for you.
+
+| Audience                 | Use case                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| ✍️ Researchers & authors | Organizing drafts, sources, and notes into a single tree‑structured base        |
+| 📚 Technical writers     | Creating documentation with a clear hierarchy and instant publishing capability |
+| 🎓 Educators & students  | Structuring learning materials, notes, and study guides                         |
+| 💻 Developers            | Maintaining project documentation, personal wikis, rapid interface prototypes   |
+
+---
+
+## Functionality levels
+
+> Each level is not about more features, but about fewer obstacles between you and the result.
+
+### 🟢 EASY
+
+Start writing within 30 seconds of launching. No setup — just text and structure.
+
+- Write, structure, organize
+
+- Visual editor and tree navigation help you stay focused on content
+
+- Ideal for those who want to work immediately, without learning tools
+
+[More about the easy mode →](https://skaldapp.github.io/easy/)
+
+### 🔴 ADVANCED
+
+Add formatting and metadata in the same interface. Don’t switch between tools — don’t lose context.
+
+- Fine‑tune style via HTML and TailwindCSS
+
+- Manage metadata without leaving the editor
+
+- Professional content styling within your usual workflow
+
+[More about the advanced mode →](https://skaldapp.github.io/medium/)
+
+### 🔵 PROFESSIONAL
+
+Embed interactivity without leaving the editor. No build configuration — just write code where it’s needed.
+
+- Reactivity via Vue components right in the text
+
+- Interactive documents, dynamic tables, complex interfaces
+
+- Full integration with the frontend stack without compromises
+
+[More about the professional mode →](https://skaldapp.github.io/hard/)
+
+---
+
+## 🤖 Your personal AI assistant
+
+- 💡 **Content generation** — creative ideas in an interactive chat
+
+- ✏️ **Smart autocomplete** — text in the visual editor
+
+- 🛠️ **Code autocomplete** — Vue.js support
+
+---
+
+## ❓ Q&A
+
+🤔 **How is Skald different from other Markdown editors?**\
+Skald combines the freedom of a text editor with the discipline of structured data. You work with a tree hierarchy of documents in a visual interface, and the result — whether a local note or a public page — is always under your full control. Publishing doesn’t require a separate build process: the structure you see in the editor is the final product.
+
+🤔 **What can you do with Skald?**\
+Create and organize any tree‑structured content: from personal notes and book drafts to technical documentation and knowledge bases. Skald provides a unified space for writing, structuring, and (when needed) publishing. You can work completely offline, sync with the cloud, or instantly publish the result online — the strategy is up to you.
+
+🤔 **How to preview a site in the browser during development?**\
+There are many ways. If you’re comfortable with the command line, follow the advice from the official Vue.js website:
+
+> To start a local HTTP server, install Node.js, then run the command `npx serve` in the project directory. You can also use any other HTTP server that supports static files with correct MIME types.
+
+A simpler way is the program [Simple Web Server](https://simplewebserver.org/en/). It’s free, cross‑platform, and lets you start a local server with a couple of clicks.
+
+🤔 **Besides the file system, what storage systems does Skald work with?**\
+In addition to the local file system (via the File System Access API), Skald supports any S3‑compatible cloud storage: AWS S3, MinIO, Cloudflare R2, DigitalOcean Spaces, and others. When connected, data is encrypted, it supports working with multiple accounts, and access can be protected by a PIN.
+
+In the Electron version, files are saved locally, ensuring full offline work without dependency on browser restrictions.
+
+🤔 **Can S3 storage be used as static hosting?**\
+Yes, most S3‑compatible services (AWS S3, Cloudflare R2, DigitalOcean Spaces) support static website hosting mode. Just enable the option in the bucket settings — and its contents become accessible via a public URL. Skald content can be published directly: the site becomes available online immediately without extra configuration.
+
+🤔 **Can I use Skald offline?**\
+Yes. The Electron version provides full autonomy with native file system access. The browser version also works offline after the initial cache load.
+
+Features requiring internet (S3 sync, AI integration) are temporarily unavailable offline, but all core operations — editing, saving, navigation — function fully autonomously.
+
+🤔 **Is it safe to add secret keys to Skald?**\
+Skald applies basic security measures: keys are stored encrypted, and S3 key access can be protected by a PIN. However, since the app runs client‑side, keys are stored in your device’s local storage.
+
+Recommendations:
+
+- Do not use keys with unlimited permissions
+- Regularly monitor their usage
+- Enable local protection via a PIN
+- Use keys only on trusted devices
+
+🤔 **Which operating systems does Skald support?**\
+Skald works on all major platforms:
+
+- **Browser version**: Chrome, Firefox, Edge, Safari on Windows, macOS, Linux, ChromeOS, and mobile devices
+- **Electron version**: native builds for Windows, macOS, and Linux with direct file system access
+
+All key features are available regardless of OS and launch method.
+
+🤔 **Which AI models does Skald support?**\
+Skald integrates with the **Mistral AI** platform and supports compatible models for:
+
+- Content generation
+- Smart text and code autocomplete
+- Interactive chat assistant
+
+A valid Mistral API key is required in the settings.
+
+🤔 **Is Node.js required to run Skald?**\
+No. The editor runs entirely client‑side: Vue component compilation, Markdown processing, and site structure generation happen directly in the browser.
+
+This lets you start working instantly — without installing dependencies, configuring environments, or running build processes.
+
+🤔 **Was vibe coding used in developing Skald?**\
+No, all code is written by hand — a deliberate architectural choice. Manual development ensures full control over logic, predictable behavior, and high maintainability.
+
+Tech stack:
+
+- TypeScript in strict mode (`strict: true`)
+- `@vue/eslint-config-typescript` — strict typing for Vue
+- `eslint-plugin-sonarjs` — detection of vulnerabilities and complex patterns
+- Prettier + `eslint-plugin-perfectionist` — code formatting
+- A suite of plugins for linting styles, manifests, and dependencies
+
+🤔 **What are Skald’s shortcomings?**\
+Skald prioritizes ease of development and instant feedback. Navigation for large projects happens client‑side. For most scenarios (documentation, blogs, knowledge bases) this is unnoticeable.
+
+If you’re building a high‑traffic public portal with millions of visits, you might consider server‑rendered solutions — but then you lose simplicity and editing speed.
+
+🤔 **What are your plans for the future?**\
+We believe the word should take shape without intermediaries. Our mission is to erase the line between conception and publication, so that every person, regardless of technical skill, can easily and confidently share their ideas with the world.
+
+Ahead lies a path toward even greater compatibility, intuitiveness, and accessibility. We strive to make publishing on the internet as natural as writing a letter: _open, write, share_. No setup, no builds, no barriers.
+
+---
+
+> Let technology serve people, not the other way around.
+
+🔗 **Official website**: [skaldapp.github.io](https://skaldapp.github.io)\
+🐙 **Source code**: [github.com/skaldapp/skaldapp](https://github.com/skaldapp/skaldapp)\
+📦 **Snap Store**: [snapcraft.io/skaldapp](https://snapcraft.io/skaldapp)
