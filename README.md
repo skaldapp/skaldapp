@@ -112,7 +112,7 @@ There are many ways. If you’re comfortable with the command line, follow the a
 
 > To start a local HTTP server, install Node.js, then run the command `npx serve` in the project directory. You can also use any other HTTP server that supports static files with correct MIME types.
 
-A simpler way is the program [Simple Web Server](https://simplewebserver.org/en/). It’s free, cross‑platform, and lets you start a local server with a couple of clicks.
+A simpler way is the program [Simple Web Server](https://simplewebserver.org). It’s free, cross‑platform, and lets you start a local server with a couple of clicks.
 
 🤔 **Besides the file system, what storage systems does Skald work with?**\
 In addition to the local file system (via the File System Access API), Skald supports any S3‑compatible cloud storage: AWS S3, MinIO, Cloudflare R2, DigitalOcean Spaces, and others. When connected, data is encrypted, it supports working with multiple accounts, and access can be protected by a PIN.
