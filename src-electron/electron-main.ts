@@ -1,5 +1,6 @@
 import { enable, initialize } from "@electron/remote/main/index.js";
 import { app, BrowserWindow, Menu, screen } from "electron";
+import electronUpdater from "electron-updater";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -37,7 +38,12 @@ initialize();
 Menu.setApplicationMenu(null);
 if (process.platform === "win32")
   app.commandLine.appendSwitch("disable-direct-composition");
-void app.whenReady().then(createWindow);
+void app.whenReady().then(async () => {
+  // eslint-disable-next-line import-x/no-named-as-default-member
+  const { autoUpdater } = electronUpdater;
+  await createWindow();
+  void autoUpdater.checkForUpdatesAndNotify();
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
