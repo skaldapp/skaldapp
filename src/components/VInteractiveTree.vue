@@ -4,6 +4,7 @@
     v-if="nodes[0]",
     ref="qtree",
     v-model:expanded="expanded",
+    default-expand-all,
     dense,
     no-selection-unset,
     node-key="id",
