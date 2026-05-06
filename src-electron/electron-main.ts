@@ -38,6 +38,7 @@ initialize();
 Menu.setApplicationMenu(null);
 if (process.platform === "win32")
   app.commandLine.appendSwitch("disable-direct-composition");
+app.commandLine.appendSwitch("enable-features", "WebGPU");
 void app.whenReady().then(async () => {
   // eslint-disable-next-line import-x/no-named-as-default-member
   const { autoUpdater } = electronUpdater;
