@@ -1,5 +1,5 @@
 <template lang="pug">
-Milkdown
+Milkdown(@click.capture="navigate")
 </template>
 
 <script setup lang="ts">
@@ -18,6 +18,7 @@ import {
   copilotPlugin,
   filenameSlice,
 } from "@skaldapp/milkdown-copilot";
+import { sharedStore } from "@skaldapp/shared";
 import { useStyleTag } from "@vueuse/core";
 import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
@@ -27,7 +28,7 @@ import { useDataStore } from "stores/data";
 import { cancel, immediate, persistent } from "stores/defaults";
 import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
-import { onUnmounted, watch } from "vue";
+import { onUnmounted, toRefs, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
@@ -48,6 +49,7 @@ const $q = useQuasar(),
   { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
   { getModel } = dataStore,
   { getObjectBlob, headObject, putObject } = ioStore,
+  { kvNodes, nodes } = toRefs(sharedStore),
   { t } = useI18n();
 
 let front = "",
@@ -106,6 +108,27 @@ const clearUrls = () => {
     } else {
       front = "";
       return value;
+    }
+  },
+  navigate = (e: MouseEvent) => {
+    const target = e.target as Element | null;
+    if (target?.classList.contains("link-display")) {
+      const href = target.getAttribute("href");
+      e.preventDefault();
+      if (href)
+        try {
+          new URL(href);
+        } catch {
+          const { pathname } = new URL(
+              href,
+              `http://localhost${kvNodes.value[selected.value]?.to ?? "/"}`,
+            ),
+            url = decodeURIComponent(
+              pathname.endsWith("/") ? pathname : `${pathname}/`,
+            ).replace(/ /g, "_"),
+            { id } = nodes.value.find(({ to }) => to === url) ?? {};
+          if (id) selected.value = id;
+        }
     }
   },
   { get } = useEditor((root) => {
