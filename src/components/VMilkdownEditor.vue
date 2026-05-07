@@ -114,11 +114,11 @@ const clearUrls = () => {
     const target = e.target as Element | null;
     if (target?.classList.contains("link-display")) {
       const href = target.getAttribute("href");
-      e.preventDefault();
       if (href)
         try {
           new URL(href);
         } catch {
+          e.preventDefault();
           const { pathname } = new URL(
               href,
               `http://localhost${kvNodes.value[selected.value]?.to ?? "/"}`,
