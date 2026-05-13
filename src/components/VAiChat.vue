@@ -1,7 +1,7 @@
 <template lang="pug">
 .scroll.q-pa-md.col.self-stretch
   q-chat-message(
-    v-for="{ parts, role, id } in chat.messages",
+    v-for="({ parts, role, id }, index) in chat.messages",
     :key="id",
     ref="chatMessages",
     :sent="role === 'user'"
@@ -16,18 +16,41 @@
       show-copy,
       :src="part.text"
     )
+    template(#stamp)
+      q-spinner-dots(
+        v-if="index === chat.messages.length - 1 && ['submitted', 'streaming'].includes(chat.status)",
+        size="md"
+      )
+  q-banner.text-white.bg-red(
+    v-if="chat.error",
+    ref="errorBanner",
+    dense,
+    inline-actions,
+    rounded
+  ) {{ chat.error?.message }}
+    template(#action)
+      q-btn(color="white", flat, icon="replay", @click="chat.regenerate()")
 q-input.q-ma-md(
   ref="input",
   v-model="message",
   autofocus,
   autogrow,
   class="max-h-1/3",
+  :disable="['submitted', 'streaming'].includes(chat.status)",
   input-class="max-h-full",
   :label="t('How can I help you today?')",
   @keydown.enter="!$event.shiftKey && ($event.preventDefault(), send())"
 )
   template(#after)
-    q-btn(dense, flat, icon="send", round, @click="send")
+    q-btn(
+      v-if="!['submitted', 'streaming'].includes(chat.status)",
+      dense,
+      flat,
+      icon="send",
+      round,
+      @click="send"
+    )
+    q-btn(v-else, dense, flat, icon="stop_circle", round, @click="chat.stop()")
 </template>
 <script setup lang="ts">
 import type { ChatTransport, LanguageModel, UIMessage } from "ai";
@@ -86,6 +109,7 @@ const block = "end",
   transport = new CustomChatTransport(),
   chat = new Chat({ transport }),
   chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
+  errorBanner = useTemplateRef<ComponentPublicInstance>("errorBanner"),
   input = useTemplateRef<QInput>("input"),
   mainStore = useMainStore(),
   message = ref(""),
@@ -133,6 +157,18 @@ watch(
     chatMessages.value?.[chatMessages.value.length - 1]?.$el.scrollIntoView({
       block,
     });
+  },
+);
+
+watch(
+  () => chat.error,
+  async (value) => {
+    if (value) {
+      await nextTick();
+      errorBanner.value?.$el.scrollIntoView({
+        block,
+      });
+    }
   },
 );
 
