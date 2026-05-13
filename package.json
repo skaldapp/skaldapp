@@ -50,7 +50,6 @@
     "@milkdown/crepe": "^7.21.1",
     "@milkdown/ctx": "^7.21.1",
     "@milkdown/kit": "^7.21.1",
-    "@milkdown/plugin-emoji": "^7.21.1",
     "@milkdown/utils": "^7.21.1",
     "@milkdown/vue": "^7.21.1",
     "@nuxtlabs/monarch-mdc": "^0.9.0",

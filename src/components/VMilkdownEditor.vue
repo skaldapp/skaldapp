@@ -10,7 +10,6 @@ import darkTheme from "@milkdown/crepe/theme/frame-dark.css?inline";
 import lightTheme from "@milkdown/crepe/theme/frame.css?inline";
 import { remarkStringifyOptionsCtx } from "@milkdown/kit/core";
 import { htmlAttr, htmlSchema } from "@milkdown/kit/preset/commonmark";
-import { emoji } from "@milkdown/plugin-emoji";
 import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import {
@@ -154,7 +153,6 @@ ${markdown}`
         ctx.set(filenameSlice, `${selected.value}.md`);
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
-      .use(emoji)
       .use(
         htmlSchema.extendSchema((prev) => (ctx) => ({
           ...prev(ctx),
