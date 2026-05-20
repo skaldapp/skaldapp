@@ -14,8 +14,11 @@ import { replaceAll } from "@milkdown/utils";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import {
   apiKeySlice,
+  baseURLSlice,
   copilotPlugin,
+  endpointSlice,
   filenameSlice,
+  modelSlice,
 } from "@skaldapp/milkdown-copilot";
 import { sharedStore } from "@skaldapp/shared";
 import { useStyleTag } from "@vueuse/core";
@@ -24,7 +27,7 @@ import { storeToRefs } from "pinia";
 import { highlight, languages } from "prismjs";
 import { useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
-import { cancel, immediate, persistent } from "stores/defaults";
+import { cancel, deep, immediate, persistent } from "stores/defaults";
 import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
 import { onUnmounted, toRefs, watch } from "vue";
@@ -44,11 +47,11 @@ const $q = useQuasar(),
   mainStore = useMainStore(),
   urls = new Map(),
   yaml = "---",
-  { apiKey, selected } = storeToRefs(mainStore),
   { css } = useStyleTag($q.dark.isActive ? darkTheme : lightTheme),
   { getModel } = dataStore,
   { getObjectBlob, headObject, putObject } = ioStore,
   { kvNodes, nodes } = toRefs(sharedStore),
+  { openAI, selected } = storeToRefs(mainStore),
   { t } = useI18n();
 
 let front = "",
@@ -149,7 +152,10 @@ ${markdown}`
         });
       })
       .editor.config((ctx) => {
-        ctx.set(apiKeySlice, apiKey.value);
+        ctx.set(apiKeySlice, openAI.value.apiKey ?? "");
+        ctx.set(baseURLSlice, openAI.value.baseURL ?? "");
+        ctx.set(endpointSlice, openAI.value.endpoint ?? "");
+        ctx.set(modelSlice, openAI.value.model ?? "");
         ctx.set(filenameSlice, `${selected.value}.md`);
         ctx.set(remarkStringifyOptionsCtx, { handlers });
       })
@@ -193,11 +199,18 @@ watch(
   { immediate },
 );
 
-watch(apiKey, (value) => {
-  get()?.action((ctx) => {
-    ctx.set(apiKeySlice, value);
-  });
-});
+watch(
+  openAI,
+  (value) => {
+    get()?.action((ctx) => {
+      ctx.set(apiKeySlice, value.apiKey ?? "");
+      ctx.set(baseURLSlice, value.baseURL ?? "");
+      ctx.set(endpointSlice, value.endpoint ?? "");
+      ctx.set(modelSlice, value.model ?? "");
+    });
+  },
+  { deep },
+);
 
 onUnmounted(clearUrls);
 </script>
