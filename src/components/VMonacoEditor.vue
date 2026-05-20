@@ -3,26 +3,28 @@
 </template>
 
 <script setup lang="ts">
+import type { TOpenAI } from "@skaldapp/shared";
 import type {
   CompletionRegistration,
   CompletionRequestBody,
 } from "monacopilot";
 
 import { registerBracketMatcher } from "@nuxtlabs/monarch-mdc";
+import { createCompletionCopilot } from "@skaldapp/milkdown-copilot";
 import { split } from "hexo-front-matter";
 import * as monaco from "monaco-editor";
-import { CompletionCopilot, registerCompletion } from "monacopilot";
+import { registerCompletion } from "monacopilot";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
-import { enabled, immediate, technologies } from "stores/defaults";
+import { deep, enabled, immediate, technologies } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
 
 let bracketMatcherDisposable: monaco.IDisposable | null = null,
   completion: CompletionRegistration | null = null,
   editor: monaco.editor.IStandaloneCodeEditor | null = null,
-  model: monaco.editor.ITextModel | null = null;
+  textModel: monaco.editor.ITextModel | null = null;
 
 const $q = useQuasar(),
   ambiguousCharacters = false,
@@ -37,7 +39,6 @@ const $q = useQuasar(),
   mainStore = useMainStore(),
   monacoRef = useTemplateRef<HTMLElement>("monacoRef"),
   onError = console.error,
-  provider = "mistral",
   scrollBeyondLastLine = false,
   severity = monaco.MarkerSeverity.Error,
   startColumn = 1,
@@ -45,15 +46,15 @@ const $q = useQuasar(),
   tabSize = 2,
   unicodeHighlight = { ambiguousCharacters },
   wordWrap = "on",
-  { apiKey, selected } = storeToRefs(mainStore),
   { getModel } = dataStore,
-  { message } = storeToRefs(dataStore);
+  { message } = storeToRefs(dataStore),
+  { openAI, selected } = storeToRefs(mainStore);
 
 const frontmatter = (message: string) => {
-    if (message && model) {
-      const { data, prefixSeparator, separator } = split(model.getValue());
+    if (message && textModel) {
+      const { data, prefixSeparator, separator } = split(textModel.getValue());
       if (data && separator === "---" && prefixSeparator)
-        monaco.editor.setModelMarkers(model, "frontmatter", [
+        monaco.editor.setModelMarkers(textModel, "frontmatter", [
           {
             endColumn,
             endLineNumber: data.split("\n").length + 2,
@@ -65,20 +66,22 @@ const frontmatter = (message: string) => {
         ]);
     } else monaco.editor.removeAllMarkers("frontmatter");
   },
-  monacopilot = (value: string) => {
+  monacopilot = ({ apiKey, baseURL, endpoint, model }: TOpenAI) => {
     completion?.deregister();
     completion = null;
-    if (value && editor && model) {
-      const copilot = new CompletionCopilot(value, {
-          model: "codestral",
-          provider,
+    if (apiKey && baseURL && model && editor && textModel) {
+      const copilot = createCompletionCopilot({
+          apiKey,
+          baseURL,
+          endpoint: endpoint ?? "",
+          model,
         }),
-        language = model.getLanguageId(),
+        language = textModel.getLanguageId(),
         requestHandler = ({ body }: { body: CompletionRequestBody }) =>
           copilot.complete({ body }),
         {
           uri: { path: filename },
-        } = model;
+        } = textModel;
 
       completion = registerCompletion(monaco, editor, {
         filename,
@@ -90,7 +93,7 @@ const frontmatter = (message: string) => {
     }
   };
 
-watch(apiKey, monacopilot);
+watch(openAI, monacopilot, { deep });
 watch(message, frontmatter);
 
 watch(
@@ -105,8 +108,8 @@ onMounted(() => {
   watch(
     selected,
     async (value) => {
-      model = await getModel(value);
-      if (editor) editor.setModel(model);
+      textModel = await getModel(value);
+      if (editor) editor.setModel(textModel);
       else {
         editor =
           monacoRef.value &&
@@ -117,14 +120,14 @@ onMounted(() => {
             fixedOverflowWidgets,
             formatOnPaste,
             formatOnType,
-            model,
+            model: textModel,
             scrollBeyondLastLine,
             tabSize,
             unicodeHighlight,
             wordWrap,
           });
         bracketMatcherDisposable = registerBracketMatcher(editor);
-        monacopilot(apiKey.value);
+        monacopilot(openAI.value);
         frontmatter(message.value);
       }
       editor?.focus();
