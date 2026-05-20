@@ -6,10 +6,10 @@ q-drawer(
   side="right",
   :width="rightDrawerWidth"
 )
-  .column.fit.no-wrap(v-if="apiKey")
+  .column.fit.no-wrap(v-if="openAI.apiKey && openAI.baseURL && openAI.model")
     v-ai-chat
   .column.justify-center.text-center.full-height.q-mx-sm.items-center(v-else)
-    q-btn(color="primary", label="AI key", push, @click="clickAI")
+    q-btn(color="primary", label="Generic OpenAI", push, @click="clickAI")
     .q-mt-md {{ t("You need an AI key to use this feature") }}
   q-separator.absolute-left(
     v-touch-pan.prevent.mouse.horizontal="resizeRightDrawer",
@@ -65,13 +65,14 @@ import type { TAppPage } from "stores/data";
 import { MilkdownProvider } from "@milkdown/vue";
 import { sharedStore } from "@skaldapp/shared";
 import { useWindowSize } from "@vueuse/core";
+import VAiDialog from "components/dialogs/VAiDialog.vue";
 import VAiChat from "components/VAiChat.vue";
 import VInteractiveTree from "components/VInteractiveTree.vue";
 import VMilkdownEditor from "components/VMilkdownEditor.vue";
 import VMonacoEditor from "components/VMonacoEditor.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { cancel, html, persistent } from "stores/defaults";
+import { persistent } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { computed, ref, toRefs, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
@@ -79,9 +80,9 @@ import { useI18n } from "vue-i18n";
 const $q = useQuasar(),
   mainStore = useMainStore(),
   tab = ref("wysiwyg"),
-  { apiKey, selected } = storeToRefs(mainStore),
   { kvNodes, nodes, tree } = toRefs(sharedStore),
   { leftDrawer, rightDrawer } = storeToRefs(mainStore),
+  { openAI, selected } = storeToRefs(mainStore),
   { t } = useI18n(),
   { width } = useWindowSize();
 
@@ -93,18 +94,10 @@ const leftDrawerWidth = ref(initialLeftDrawerWidth),
 
 const clickAI = () => {
     $q.dialog({
-      cancel,
-      html,
-      message: `${t("Get Mistral API Key")} at <a class="underline text-blue" href="https://console.mistral.ai/api-keys" target="_blank" rel="noreferrer">https://console.mistral.ai/api-keys</a>`,
-      persistent,
-      prompt: {
-        hint: t("paste Mistral API Key only on a trusted computer"),
-        model: apiKey.value,
-        type: "password",
-      },
-      title: "Mistral API Key",
-    }).onOk((data: string) => {
-      apiKey.value = data;
+      component: VAiDialog,
+      componentProps: { persistent },
+    }).onOk((openAI) => {
+      mainStore.openAI = openAI;
     });
   },
   resizeLeftDrawer: TouchPanValue = ({ isFirst, offset: { x } = {} }) => {
