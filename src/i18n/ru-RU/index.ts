@@ -26,10 +26,9 @@ export default Object.fromEntries([
     "Robots.txt is a text file that contains site indexing parameters for the search engine robots",
     "Robots.txt — это текстовый файл, который содержит параметры индексирования сайта для роботов поисковых систем",
   ],
-  ["Get Mistral API Key", "Получить Mistral API Key"],
   [
-    "paste Mistral API Key only on a trusted computer",
-    "вводите Mistral API Key только на безопасном компьютере",
+    "Paste API Key only on a trusted computer",
+    "Вводите API Key только на безопасном компьютере",
   ],
   [
     "You need an AI key to use this feature",
@@ -39,5 +38,13 @@ export default Object.fromEntries([
   [
     "The file is already exist, do you want to replace it?",
     "Файл уже существует, хотите заменить его?",
+  ],
+  [
+    "Model id used for chat requests",
+    "Идентификатор модели, используемый для запросов чата",
+  ],
+  [
+    "Leave the FIM Endpoint field blank if the LLM doesn't support Fill-in-the-Middle",
+    "Оставьте поле FIM Endpoint пустым, если LLM не поддерживает Fill-in-the-Middle",
   ],
 ]);

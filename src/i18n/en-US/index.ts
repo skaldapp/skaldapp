@@ -21,10 +21,11 @@ export default Object.fromEntries(
     "Enter a valid domain name:",
     "Domain",
     "Robots.txt is a text file that contains site indexing parameters for the search engine robots",
-    "Get Mistral API Key",
-    "paste Mistral API Key only on a trusted computer",
+    "Paste API Key only on a trusted computer",
     "You need an AI key to use this feature",
     "How can I help you today?",
     "The file is already exist, do you want to replace it?",
+    "Model id used for chat requests",
+    "Leave the FIM Endpoint field blank if the LLM doesn't support Fill-in-the-Middle",
   ].map((key) => [key, key]),
 );
