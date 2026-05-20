@@ -57,15 +57,10 @@ import type { ChatTransport, LanguageModel, UIMessage } from "ai";
 import type { QInput } from "quasar";
 import type { ComponentPublicInstance } from "vue";
 
-import { createMistral } from "@ai-sdk/mistral";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { Chat } from "@ai-sdk/vue";
 import { whenever } from "@vueuse/core";
-import {
-  convertToModelMessages,
-  defaultSettingsMiddleware,
-  streamText,
-  wrapLanguageModel,
-} from "ai";
+import { convertToModelMessages, streamText } from "ai";
 import abbreviation from "markdown-it-abbr";
 import deflist from "markdown-it-deflist";
 import { full as emoji } from "markdown-it-emoji";
@@ -76,7 +71,7 @@ import subscript from "markdown-it-sub";
 import superscript from "markdown-it-sup";
 import taskLists from "markdown-it-task-lists";
 import { storeToRefs } from "pinia";
-import { immediate } from "stores/defaults";
+import { deep, immediate } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -113,6 +108,7 @@ const block = "end",
   input = useTemplateRef<QInput>("input"),
   mainStore = useMainStore(),
   message = ref(""),
+  name = "chat",
   plugins = [
     abbreviation,
     deflist,
@@ -130,24 +126,19 @@ const block = "end",
       message.value = "";
     }
   },
-  { apiKey, rightDrawer } = storeToRefs(mainStore),
+  { openAI, rightDrawer } = storeToRefs(mainStore),
   { t } = useI18n();
 
 watch(
-  apiKey,
-  (value) => {
+  openAI,
+  ({ apiKey, baseURL, model }) => {
     transport.updateModel(
-      value
-        ? wrapLanguageModel({
-            middleware: defaultSettingsMiddleware({
-              settings: { providerOptions: { mistral: { safePrompt: true } } },
-            }),
-            model: createMistral({ apiKey: value })("codestral-latest"),
-          })
+      apiKey && baseURL && model
+        ? createOpenAICompatible({ apiKey, baseURL, name })(model)
         : undefined,
     );
   },
-  { immediate },
+  { deep, immediate },
 );
 
 watch(
