@@ -29,6 +29,7 @@ q-btn-dropdown.q-mr-xs(auto-close, dropdown-icon="apps", flat, square, stretch)
 </template>
 
 <script setup lang="ts">
+import VAiDialog from "components/dialogs/VAiDialog.vue";
 import VFaviconDialog from "components/dialogs/VFaviconDialog.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
@@ -42,7 +43,6 @@ const $q = useQuasar(),
   dataStore = useDataStore(),
   ioStore = useIoStore(),
   mainStore = useMainStore(),
-  { apiKey } = storeToRefs(mainStore),
   { domain } = storeToRefs(dataStore),
   { getObjectText, putObject } = ioStore,
   { putPages, putSitemap } = dataStore,
@@ -50,18 +50,10 @@ const $q = useQuasar(),
 
 const clickAI = () => {
     $q.dialog({
-      cancel,
-      html: true,
-      message: `${t("Get Mistral API Key")} at <a class="underline text-blue" href="https://console.mistral.ai/api-keys" target="_blank" rel="noreferrer">https://console.mistral.ai/api-keys</a>`,
-      persistent,
-      prompt: {
-        hint: t("paste Mistral API Key only on a trusted computer"),
-        model: apiKey.value,
-        type: "password",
-      },
-      title: "Mistral API Key",
-    }).onOk((data: string) => {
-      apiKey.value = data;
+      component: VAiDialog,
+      componentProps: { persistent },
+    }).onOk((openAI) => {
+      mainStore.openAI = openAI;
     });
   },
   clickDomain = () => {
