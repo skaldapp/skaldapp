@@ -1,6 +1,8 @@
 ---
 title: Title
 description: Description
+keywords:
+  - page
 attrs:
   un-cloak: true
   class:
