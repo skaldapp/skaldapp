@@ -57,6 +57,32 @@ q-page.column.full-height(v-if="the")
 q-page.column.full-height.bg-light(v-else)
   q-inner-loading(showing)
     q-spinner-hourglass
+q-footer
+  .row.no-wrap
+    .col-12.col-xs-6.col-sm-5.col-md-4.col-lg-3.col-xl-2.row.no-wrap
+      q-chip.col(icon="article", :ripple="false", size="sm", square)
+        template(#default)
+          .ellipsis {{ kvNodes[selected]?.name }}
+      q-chip.col.ellipsis(icon="save", :ripple="false", size="sm", square)
+        template(#default)
+          .ellipsis {{ kvNodes[selected]?.id }}
+    q-tabs.gt-xs(
+      v-model="tab",
+      dense,
+      mobile-arrows,
+      narrow-indicator,
+      outside-arrows,
+      :shrink="true",
+      stretch
+    )
+      q-chip(
+        v-for="key in keywords",
+        :key,
+        icon="tag",
+        :outline="true",
+        size="sm",
+        square
+      ) {{ key }}
 </template>
 <script setup lang="ts">
 import type { TouchPanValue } from "quasar";
@@ -100,6 +126,21 @@ const clickAI = () => {
       mainStore.openAI = openAI;
     });
   },
+  keywords = computed(() => {
+    const { frontmatter: { keywords } = {} } =
+      kvNodes.value[selected.value] ?? {};
+    return [
+      ...new Set(
+        (Array.isArray(keywords) ? keywords : [keywords])
+          .flat(Infinity)
+          .filter((keyword) => typeof keyword !== "object")
+          .join(",")
+          .split(",")
+          .map((val) => val.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    ];
+  }),
   resizeLeftDrawer: TouchPanValue = ({ isFirst, offset: { x } = {} }) => {
     if ($q.screen.gt.sm) {
       if (isFirst) initialLeftDrawerWidth = leftDrawerWidth.value;
@@ -151,5 +192,8 @@ rightDrawer.value = false;
 }
 .cursor-ew-resize {
   cursor: ew-resize;
+}
+.q-footer :deep(.q-tabs__arrow) {
+  font-size: 80%;
 }
 </style>
