@@ -35,12 +35,14 @@ a:hover {
   color: $nord10;
 }
 
-.body--light .q-header {
+.body--light .q-header,
+.body--light .q-footer {
   color: $nord2;
   background-color: white;
 }
 
-.body--dark .q-header {
+.body--dark .q-header,
+.body--dark .q-footer {
   color: $nord6;
   background-color: $nord0;
 }
