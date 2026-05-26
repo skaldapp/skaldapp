@@ -120,23 +120,35 @@ export const useDataStore = defineStore("data", () => {
             ) => {
               if (array.length - 1 === index || template) {
                 const {
-                  base, // eslint-disable-line @typescript-eslint/no-unused-vars
-                  bodyAttrs,
-                  htmlAttrs,
-                  link,
-                  meta,
-                  noscript,
-                  script,
-                  style,
-                  templateParams,
-                  title,
-                  titleTemplate,
-                  ..._flatMeta
-                } = head as SerializableHead;
-
+                    base, // eslint-disable-line @typescript-eslint/no-unused-vars
+                    bodyAttrs,
+                    htmlAttrs,
+                    link,
+                    meta,
+                    noscript,
+                    script,
+                    style,
+                    templateParams,
+                    title,
+                    titleTemplate,
+                    ..._flatMeta
+                  } = head as SerializableHead,
+                  { keywords, ...flatMeta } = _flatMeta as Record<
+                    string,
+                    unknown
+                  > & {
+                    keywords?: string | string[];
+                  };
                 vueHeadClient.push({
                   // @ts-expect-error runtime type
-                  _flatMeta,
+                  _flatMeta: {
+                    ...flatMeta,
+                    ...(keywords && {
+                      keywords: Array.isArray(keywords)
+                        ? keywords.join(",")
+                        : keywords,
+                    }),
+                  },
                   base: { href },
                   bodyAttrs,
                   htmlAttrs,
