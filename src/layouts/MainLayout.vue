@@ -45,7 +45,7 @@ q-layout(view="hHh LpR fff", @keyup.esc="rightDrawer = false")
 </template>
 
 <script setup lang="ts">
-import { fasMountain } from "@quasar/extras/fontawesome-v6";
+import { fasMountain } from "@quasar/extras/fontawesome-v7";
 import VMainMenu from "components/VMainMenu.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
