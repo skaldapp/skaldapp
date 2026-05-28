@@ -62,7 +62,7 @@ q-footer
     .col-12.col-xs-6.col-sm-5.col-md-4.col-lg-3.row.no-wrap
       q-chip.col(icon="article", :ripple="false", size="sm", square)
         template(#default)
-          .ellipsis {{ kvNodes[selected]?.name }}
+          .ellipsis {{ kvNodes[selected]?.frontmatter.title || kvNodes[selected]?.name }}
       q-chip.col.ellipsis(icon="save", :ripple="false", size="sm", square)
         template(#default)
           .ellipsis {{ kvNodes[selected]?.id && `docs/${kvNodes[selected]?.id}.md` }}
