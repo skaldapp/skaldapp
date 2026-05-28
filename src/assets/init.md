@@ -1,8 +1,8 @@
 ---
-title: Title
-description: Description
+title:
+description:
 keywords:
-  - page
+  -
 attrs:
   un-cloak: true
   class:
