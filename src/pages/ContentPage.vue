@@ -59,13 +59,13 @@ q-page.column.full-height.bg-light(v-else)
     q-spinner-hourglass
 q-footer
   .row.no-wrap
-    .col-12.col-xs-6.col-sm-5.col-md-4.col-lg-3.col-xl-2.row.no-wrap
+    .col-12.col-xs-6.col-sm-5.col-md-4.col-lg-3.row.no-wrap
       q-chip.col(icon="article", :ripple="false", size="sm", square)
         template(#default)
           .ellipsis {{ kvNodes[selected]?.name }}
       q-chip.col.ellipsis(icon="save", :ripple="false", size="sm", square)
         template(#default)
-          .ellipsis {{ kvNodes[selected]?.id }}
+          .ellipsis {{ kvNodes[selected]?.id && `docs/${kvNodes[selected]?.id}.md` }}
     q-tabs.gt-xs(
       v-model="tab",
       dense,
