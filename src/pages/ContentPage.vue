@@ -67,7 +67,6 @@ q-footer
         template(#default)
           .ellipsis {{ kvNodes[selected]?.id && `docs/${kvNodes[selected]?.id}.md` }}
     q-tabs.gt-xs(
-      v-model="tab",
       dense,
       mobile-arrows,
       narrow-indicator,
@@ -80,8 +79,7 @@ q-footer
         :key,
         icon="tag",
         :outline="true",
-        size="sm",
-        square
+        size="sm"
       ) {{ key }}
 </template>
 <script setup lang="ts">
@@ -195,5 +193,12 @@ rightDrawer.value = false;
 }
 .q-footer :deep(.q-tabs__arrow) {
   font-size: 80%;
+}
+.q-tabs :deep(.q-chip) {
+  max-width: unset;
+  margin: unset;
+}
+.q-tabs :deep(.q-chip--outline) {
+  border: unset;
 }
 </style>
