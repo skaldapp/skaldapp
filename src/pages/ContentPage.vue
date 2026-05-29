@@ -96,14 +96,17 @@ import VMilkdownEditor from "components/VMilkdownEditor.vue";
 import VMonacoEditor from "components/VMonacoEditor.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
+import { useDataStore } from "stores/data";
 import { persistent } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { computed, ref, toRefs, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
+  dataStore = useDataStore(),
   mainStore = useMainStore(),
   tab = ref("wysiwyg"),
+  { getKeywords } = dataStore,
   { kvNodes, nodes, tree } = toRefs(sharedStore),
   { leftDrawer, rightDrawer } = storeToRefs(mainStore),
   { openAI, selected } = storeToRefs(mainStore),
@@ -124,21 +127,7 @@ const clickAI = () => {
       mainStore.openAI = openAI;
     });
   },
-  keywords = computed(() => {
-    const { frontmatter: { keywords } = {} } =
-      kvNodes.value[selected.value] ?? {};
-    return [
-      ...new Set(
-        (Array.isArray(keywords) ? keywords : [keywords])
-          .flat(Infinity)
-          .filter((keyword) => typeof keyword !== "object")
-          .join(",")
-          .split(",")
-          .map((val) => val.trim().toLowerCase())
-          .filter(Boolean),
-      ),
-    ];
-  }),
+  keywords = computed(() => [...new Set(getKeywords(selected.value))]),
   resizeLeftDrawer: TouchPanValue = ({ isFirst, offset: { x } = {} }) => {
     if ($q.screen.gt.sm) {
       if (isFirst) initialLeftDrawerWidth = leftDrawerWidth.value;

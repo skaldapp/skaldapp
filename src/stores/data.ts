@@ -58,7 +58,17 @@ export const useDataStore = defineStore("data", () => {
     return "";
   };
 
-  const getModel = async (id: string) => {
+  const getKeywords = (id: string) => {
+      const { frontmatter: { keywords } = {} } = kvNodes.value[id] ?? {};
+      return (Array.isArray(keywords) ? keywords : [keywords])
+        .flat(Infinity)
+        .filter((keyword) => typeof keyword !== "object")
+        .join(",")
+        .split(",")
+        .map((val) => val.trim().toLowerCase())
+        .filter(Boolean);
+    },
+    getModel = async (id: string) => {
       const uri = Uri.parse(`file:///${id}.md`);
       let model = editor.getModel(uri);
       const putObjectDebounced = debounce(() => {
@@ -204,6 +214,7 @@ ${headTags}`,
 
   return {
     domain,
+    getKeywords,
     getModel,
     message,
     putPages,
