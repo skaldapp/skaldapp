@@ -78,6 +78,7 @@ import ContentPage from "pages/ContentPage.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import MainLayout from "src/layouts/MainLayout.vue";
+import { useDataStore } from "stores/data";
 import { persistent } from "stores/defaults";
 import { useIoStore } from "stores/io";
 import { useMainStore } from "stores/main";
@@ -87,11 +88,13 @@ import { useRouter } from "vue-router";
 
 const $q = useQuasar(),
   APP_VERSION = __APP_VERSION__,
+  dataStore = useDataStore(),
   ioStore = useIoStore(),
   mainStore = useMainStore(),
   router = useRouter(),
-  { credential, rightDrawer } = storeToRefs(mainStore),
+  { credential } = storeToRefs(mainStore),
   { headBucket, setFileSystemDirectoryHandle } = ioStore,
+  { rightDrawer } = storeToRefs(dataStore),
   { t } = useI18n();
 
 const add = () => {
