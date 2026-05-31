@@ -1,11 +1,30 @@
 <template lang="pug">
+q-select(
+  v-if="keywords.length",
+  v-model="selectedKeywords",
+  fill-input,
+  filled,
+  input-debounce="0",
+  label="keywords",
+  multiple,
+  :options,
+  square,
+  use-chips,
+  use-input,
+  @filter="(inputValue, afterFn) => { afterFn(() => { needle = inputValue.toLocaleLowerCase(); }); }"
+)
+  template(#no-option)
+    q-item
+      q-item-section —
 .scroll.col
-  q-tree.q-ma-md(
+  q-tree.q-my-md.q-mr-md.q-ml-xs(
     v-if="nodes[0]",
     ref="qtree",
     v-model:expanded="expanded",
     default-expand-all,
     dense,
+    :filter,
+    :filter-method,
     no-selection-unset,
     node-key="id",
     :nodes="[nodes[0]]",
@@ -76,37 +95,23 @@ import { debounce, useQuasar } from "quasar";
 import { useDataStore } from "stores/data";
 import { cancel, deep, immediate, persistent, second } from "stores/defaults";
 import { useIoStore } from "stores/io";
-import { useMainStore } from "stores/main";
-import { ref, toRefs, useTemplateRef, watch } from "vue";
+import { computed, ref, toRefs, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
+  { kvNodes, nodes } = toRefs(sharedStore),
+  expanded = ref([nodes.value[0]?.id]),
   ioStore = useIoStore(),
-  mainStore = useMainStore(),
+  needle = ref(""),
   qtree = useTemplateRef<QTree>("qtree"),
   state = ref(false),
   visible = ref(false),
   { add, addChild, down, left, remove, right, up } = sharedStore,
   { deleteObject, putObject } = ioStore,
-  { kvNodes, nodes } = toRefs(sharedStore),
-  { putPages, putSitemap } = dataStore,
-  { selected } = storeToRefs(mainStore),
+  { getKeywords, putPages, putSitemap } = dataStore,
+  { keywords, selected, selectedKeywords } = storeToRefs(dataStore),
   { t } = useI18n();
-
-const errors = [
-    (propNode: TPage) => !propNode.name,
-    (propNode: TPage) =>
-      !!nodes.value.find(
-        (element) =>
-          propNode.path &&
-          element.id !== propNode.id &&
-          element.path === propNode.path,
-      ),
-    (propNode: TPage) =>
-      ["?", "\\", "#"].some((value) => propNode.name?.includes(value)),
-  ],
-  expanded = ref([nodes.value[0]?.id]);
 
 const cleaner = (value: TPage[]) => {
     value.forEach((page) => {
@@ -169,7 +174,36 @@ const cleaner = (value: TPage[]) => {
     if (selected.value) up(selected.value);
     state.value = true;
   },
-  error = (propNode: TPage) =>
+  errors = [
+    (propNode: TPage) => !propNode.name,
+    (propNode: TPage) =>
+      !!nodes.value.find(
+        (element) =>
+          propNode.path &&
+          element.id !== propNode.id &&
+          element.path === propNode.path,
+      ),
+    (propNode: TPage) =>
+      ["?", "\\", "#"].some((value) => propNode.name?.includes(value)),
+  ],
+  filter = computed(() => selectedKeywords.value.join(",")),
+  filterMethod = ({ id }: TPage, filter: string) => {
+    const keywords = new Set(getKeywords(id));
+    return filter.split(",").some((value) => keywords.has(value));
+  },
+  onIntersection = (entry: IntersectionObserverEntry) => {
+    if (
+      entry.target instanceof HTMLElement &&
+      entry.target.dataset.id === selected.value
+    )
+      visible.value = entry.isIntersecting;
+    return true;
+  },
+  options = computed(() =>
+    keywords.value.filter((keyword) => keyword.includes(needle.value)),
+  );
+
+const error = (propNode: TPage) =>
     errors
       .map((errFnc) => errFnc(propNode))
       .reduceRight(
@@ -186,14 +220,6 @@ const cleaner = (value: TPage[]) => {
       default:
         return undefined;
     }
-  },
-  onIntersection = (entry: IntersectionObserverEntry) => {
-    if (
-      entry.target instanceof HTMLElement &&
-      entry.target.dataset.id === selected.value
-    )
-      visible.value = entry.isIntersecting;
-    return true;
   };
 
 watch(
