@@ -19,7 +19,7 @@ import {
   MinifyPlugin,
   TemplateParamsPlugin,
 } from "unhead/plugins";
-import { ref, toRefs } from "vue";
+import { computed, ref, toRefs, watch } from "vue";
 
 export type TAppPage = TPage & {
   contenteditable: boolean;
@@ -28,8 +28,12 @@ export type TAppPage = TPage & {
 export const useDataStore = defineStore("data", () => {
   const domain = ref(""),
     ioStore = useIoStore(),
+    leftDrawer = ref(false),
     message = ref(""),
     oldPages: string[] = [],
+    rightDrawer = ref(false),
+    selected = ref(""),
+    selectedKeywords = ref<string[]>([]),
     { $nodes, kvNodes, nodes } = toRefs(sharedStore),
     { data: body } = useFetch(`runtime/index.html`).text(),
     { deleteObject, getObjectText, putObject, removeEmptyDirectories } =
@@ -87,6 +91,9 @@ export const useDataStore = defineStore("data", () => {
       }
       return model;
     },
+    keywords = computed(() => [
+      ...new Set(nodes.value.flatMap(({ id }) => getKeywords(id))),
+    ]),
     putPages = async () => {
       const promises: Promise<void>[] = [];
       oldPages.forEach((url) => {
@@ -212,13 +219,24 @@ ${headTags}`,
       );
     };
 
+  watch(keywords, (value) => {
+    selectedKeywords.value = selectedKeywords.value.filter((keyword) =>
+      value.includes(keyword),
+    );
+  });
+
   return {
     domain,
     getKeywords,
     getModel,
+    keywords,
+    leftDrawer,
     message,
     putPages,
     putSitemap,
+    rightDrawer,
+    selected,
+    selectedKeywords,
   };
 });
 
