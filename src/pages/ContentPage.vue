@@ -79,7 +79,11 @@ q-footer
         :key,
         icon="tag",
         :outline="true",
-        size="sm"
+        :ripple="false",
+        :selected="selectedKeywords.includes(key)",
+        size="sm",
+        square,
+        @update:selected="(state) => (state ? selectedKeywords.push(key) : selectedKeywords.splice(selectedKeywords.indexOf(key), 1))"
       ) {{ key }}
 </template>
 <script setup lang="ts">
@@ -108,8 +112,9 @@ const $q = useQuasar(),
   tab = ref("wysiwyg"),
   { getKeywords } = dataStore,
   { kvNodes, nodes, tree } = toRefs(sharedStore),
-  { leftDrawer, rightDrawer } = storeToRefs(mainStore),
-  { openAI, selected } = storeToRefs(mainStore),
+  { leftDrawer, rightDrawer, selected, selectedKeywords } =
+    storeToRefs(dataStore),
+  { openAI } = storeToRefs(mainStore),
   { t } = useI18n(),
   { width } = useWindowSize();
 
