@@ -1,17 +1,17 @@
 import { sharedStore } from "@skaldapp/shared";
 import { storeToRefs } from "pinia";
 import routes from "src/router/routes";
+import { useDataStore } from "stores/data";
 import { useIoStore } from "stores/io";
-import { useMainStore } from "stores/main";
 import { toRefs } from "vue";
 
 import { defineBoot } from "#q-app/wrappers";
 
 const [route] = routes,
+  dataStore = useDataStore(),
   ioStore = useIoStore(),
-  mainStore = useMainStore(),
   { reset } = ioStore,
-  { selected } = storeToRefs(mainStore),
+  { selected } = storeToRefs(dataStore),
   { tree } = toRefs(sharedStore);
 
 export default defineBoot(({ router }) => {
