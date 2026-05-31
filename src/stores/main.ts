@@ -2,21 +2,10 @@ import type { TCredential, TOpenAI } from "@skaldapp/shared";
 
 import { acceptHMRUpdate, defineStore } from "pinia";
 
-const apiKey = "",
-  credential: Record<string, TCredential> = {},
-  leftDrawer = false,
-  openAI: TOpenAI = { apiKey: "", baseURL: "", endpoint: "", model: "" },
-  rightDrawer = false,
-  selected = "";
+const credential: Record<string, TCredential> = {},
+  openAI: TOpenAI = { apiKey: "", baseURL: "", endpoint: "", model: "" };
 export const useMainStore = defineStore("skald", {
-  state: () => ({
-    apiKey,
-    credential,
-    leftDrawer,
-    openAI,
-    rightDrawer,
-    selected,
-  }),
+  state: () => ({ credential, openAI }),
 });
 
 if (import.meta.hot)
