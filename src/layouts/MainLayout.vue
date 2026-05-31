@@ -49,15 +49,15 @@ import { fasMountain } from "@quasar/extras/fontawesome-v7";
 import VMainMenu from "components/VMainMenu.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
+import { useDataStore } from "stores/data";
 import { useIoStore } from "stores/io";
-import { useMainStore } from "stores/main";
 import { toRefs, watch } from "vue";
 
 const $q = useQuasar(),
+  dataStore = useDataStore(),
   ioStore = useIoStore(),
-  mainStore = useMainStore(),
   { bucket } = toRefs(ioStore),
-  { leftDrawer, rightDrawer } = storeToRefs(mainStore);
+  { leftDrawer, rightDrawer } = storeToRefs(dataStore);
 
 watch(
   () => $q.dark.isActive,
