@@ -51,7 +51,8 @@ const $q = useQuasar(),
   { getModel } = dataStore,
   { getObjectBlob, headObject, putObject } = ioStore,
   { kvNodes, nodes } = toRefs(sharedStore),
-  { openAI, selected } = storeToRefs(mainStore),
+  { openAI } = storeToRefs(mainStore),
+  { selected } = storeToRefs(dataStore),
   { t } = useI18n();
 
 let front = "",
