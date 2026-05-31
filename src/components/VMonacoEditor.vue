@@ -47,8 +47,8 @@ const $q = useQuasar(),
   unicodeHighlight = { ambiguousCharacters },
   wordWrap = "on",
   { getModel } = dataStore,
-  { message } = storeToRefs(dataStore),
-  { openAI, selected } = storeToRefs(mainStore);
+  { message, selected } = storeToRefs(dataStore),
+  { openAI } = storeToRefs(mainStore);
 
 const frontmatter = (message: string) => {
     if (message && textModel) {
