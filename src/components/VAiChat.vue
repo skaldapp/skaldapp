@@ -71,6 +71,7 @@ import subscript from "markdown-it-sub";
 import superscript from "markdown-it-sup";
 import taskLists from "markdown-it-task-lists";
 import { storeToRefs } from "pinia";
+import { useDataStore } from "stores/data";
 import { deep, immediate } from "stores/defaults";
 import { useMainStore } from "stores/main";
 import { nextTick, ref, useTemplateRef, watch } from "vue";
@@ -104,6 +105,7 @@ const block = "end",
   transport = new CustomChatTransport(),
   chat = new Chat({ transport }),
   chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
+  dataStore = useDataStore(),
   errorBanner = useTemplateRef<ComponentPublicInstance>("errorBanner"),
   input = useTemplateRef<QInput>("input"),
   mainStore = useMainStore(),
@@ -126,7 +128,8 @@ const block = "end",
       message.value = "";
     }
   },
-  { openAI, rightDrawer } = storeToRefs(mainStore),
+  { openAI } = storeToRefs(mainStore),
+  { rightDrawer } = storeToRefs(dataStore),
   { t } = useI18n();
 
 watch(
