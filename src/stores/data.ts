@@ -4,13 +4,10 @@ import type { SerializableHead } from "unhead/types";
 import { sharedStore } from "@skaldapp/shared";
 import { createHead } from "@unhead/vue/server";
 import { useFetch } from "@vueuse/core";
-import init from "assets/init.md?raw";
 import { parse } from "hexo-front-matter";
 import { editor, Uri } from "monaco-editor";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { debounce } from "quasar";
-import { cache, second } from "stores/defaults";
-import { useIoStore } from "stores/io";
 import {
   AliasSortingPlugin,
   CanonicalPlugin,
@@ -19,7 +16,11 @@ import {
   MinifyPlugin,
   TemplateParamsPlugin,
 } from "unhead/plugins";
-import { computed, ref, toRefs, watch } from "vue";
+import { computed, ref, toRefs } from "vue";
+
+import init from "@/assets/init.md?raw";
+import { cache, second } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
 
 export type TAppPage = TPage & {
   contenteditable: boolean;
@@ -218,12 +219,6 @@ ${headTags}`,
         "text/plain",
       );
     };
-
-  watch(keywords, (value) => {
-    selectedKeywords.value = selectedKeywords.value.filter((keyword) =>
-      value.includes(keyword),
-    );
-  });
 
   return {
     domain,
