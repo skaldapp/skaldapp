@@ -50,7 +50,7 @@ q-page.column.full-height(v-if="the")
             q-spinner-hourglass
     q-tab-panel(name="md")
       Suspense
-        v-monaco-editor
+        v-monaco-editor.full-height.full-width
           template(#fallback)
             q-inner-loading(showing)
               q-spinner-hourglass
@@ -60,6 +60,9 @@ q-page.column.full-height.bg-light(v-else)
 q-footer
   .row.no-wrap
     .col-12.col-xs-6.col-sm-5.col-md-4.col-lg-3.row.no-wrap
+      q-chip.max-w-third(icon="folder", :ripple="false", size="sm", square)
+        template(#default)
+          .ellipsis {{ bucket }}
       q-chip.col(icon="article", :ripple="false", size="sm", square)
         template(#default)
           .ellipsis {{ kvNodes[selected]?.frontmatter.title || kvNodes[selected]?.name }}
@@ -75,7 +78,7 @@ q-footer
       stretch
     )
       q-chip(
-        v-for="key in keywords",
+        v-for="key in [...new Set(getKeywords(selected))]",
         :key,
         icon="tag",
         :outline="true",
@@ -88,32 +91,37 @@ q-footer
 </template>
 <script setup lang="ts">
 import type { TouchPanValue } from "quasar";
-import type { TAppPage } from "stores/data";
 
 import { MilkdownProvider } from "@milkdown/vue";
 import { sharedStore } from "@skaldapp/shared";
 import { useWindowSize } from "@vueuse/core";
-import VAiDialog from "components/dialogs/VAiDialog.vue";
-import VAiChat from "components/VAiChat.vue";
-import VInteractiveTree from "components/VInteractiveTree.vue";
-import VMilkdownEditor from "components/VMilkdownEditor.vue";
-import VMonacoEditor from "components/VMonacoEditor.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { useDataStore } from "stores/data";
-import { persistent } from "stores/defaults";
-import { useMainStore } from "stores/main";
-import { computed, ref, toRefs, watchEffect } from "vue";
+import { computed, ref, toRefs, watch, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
+
+import type { TAppPage } from "@/stores/data";
+
+import VAiDialog from "@/components/dialogs/VAiDialog.vue";
+import VAiChat from "@/components/VAiChat.vue";
+import VInteractiveTree from "@/components/VInteractiveTree.vue";
+import VMilkdownEditor from "@/components/VMilkdownEditor.vue";
+import VMonacoEditor from "@/components/VMonacoEditor.vue";
+import { useDataStore } from "@/stores/data";
+import { persistent, writable } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
+import { useMainStore } from "@/stores/main";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
+  ioStore = useIoStore(),
   mainStore = useMainStore(),
   tab = ref("wysiwyg"),
+  { bucket } = toRefs(ioStore),
   { getKeywords } = dataStore,
-  { kvNodes, nodes, tree } = toRefs(sharedStore),
-  { leftDrawer, rightDrawer, selected, selectedKeywords } =
+  { keywords, leftDrawer, rightDrawer, selected, selectedKeywords } =
     storeToRefs(dataStore),
+  { kvNodes, nodes, tree } = toRefs(sharedStore),
   { openAI } = storeToRefs(mainStore),
   { t } = useI18n(),
   { width } = useWindowSize();
@@ -132,7 +140,6 @@ const clickAI = () => {
       mainStore.openAI = openAI;
     });
   },
-  keywords = computed(() => [...new Set(getKeywords(selected.value))]),
   resizeLeftDrawer: TouchPanValue = ({ isFirst, offset: { x } = {} }) => {
     if ($q.screen.gt.sm) {
       if (isFirst) initialLeftDrawerWidth = leftDrawerWidth.value;
@@ -175,6 +182,22 @@ watchEffect(() => {
   else if ($q.screen.lt.md) rightDrawerWidth.value = width.value;
 });
 
+watch(keywords, (value) => {
+  selectedKeywords.value = selectedKeywords.value.filter((keyword) =>
+    value.includes(keyword),
+  );
+});
+
+watch(nodes, (value) => {
+  value.forEach((object) => {
+    if (!("contenteditable" in object))
+      Object.defineProperty(object, "contenteditable", {
+        value: false,
+        writable,
+      });
+  });
+});
+
 rightDrawer.value = false;
 </script>
 
@@ -194,5 +217,8 @@ rightDrawer.value = false;
 }
 .q-tabs :deep(.q-chip--outline) {
   border: unset;
+}
+.max-w-third {
+  max-width: calc(100% / 3);
 }
 </style>
