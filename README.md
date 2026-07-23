@@ -133,26 +133,30 @@ Skald applies basic security measures: keys are stored encrypted, and S3 key acc
 Recommendations:
 
 - Do not use keys with unlimited permissions
+
 - Regularly monitor their usage
+
 - Enable local protection via a PIN
+
 - Use keys only on trusted devices
 
 🤔 **Which operating systems does Skald support?**\
 Skald works on all major platforms:
 
 - **Browser version**: Chrome, Firefox, Edge, Safari on Windows, macOS, Linux, ChromeOS, and mobile devices
+
 - **Electron version**: native builds for Windows, macOS, and Linux with direct file system access
 
 All key features are available regardless of OS and launch method.
 
 🤔 **Which AI models does Skald support?**\
-Skald integrates with the **Mistral AI** platform and supports compatible models for:
+Skald implements support for the OpenAI protocol, allowing the connection of any compatible models. The integration enables the following features:
 
-- Content generation
-- Smart text and code autocomplete
-- Interactive chat assistant
+- Content generation;
 
-A valid Mistral API key is required in the settings.
+- Smart text and code autocompletion;
+
+- Interactive chat assistant.
 
 🤔 **Is Node.js required to run Skald?**\
 No. The editor runs entirely client‑side: Vue component compilation, Markdown processing, and site structure generation happen directly in the browser.
@@ -165,9 +169,13 @@ No, all code is written by hand — a deliberate architectural choice. Manual de
 Tech stack:
 
 - TypeScript in strict mode (`strict: true`)
+
 - `@vue/eslint-config-typescript` — strict typing for Vue
+
 - `eslint-plugin-sonarjs` — detection of vulnerabilities and complex patterns
+
 - Prettier + `eslint-plugin-perfectionist` — code formatting
+
 - A suite of plugins for linting styles, manifests, and dependencies
 
 🤔 **What are Skald’s shortcomings?**\
