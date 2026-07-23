@@ -13,7 +13,7 @@ q-drawer.no-scroll(v-model="rightDrawer", show-if-above, side="right")
     q-card-section.col.scroll
       q-list
         q-item(
-          v-for="[name, cred] in Object.entries(credential).sort()",
+          v-for="[name, cred] in Object.entries(credentials).sort()",
           :key="name",
           v-ripple,
           clickable,
@@ -69,22 +69,23 @@ q-page.column.no-scroll
       .text-overline {{ t("ver") }}.: {{ APP_VERSION }}
 </template>
 <script setup lang="ts">
-import type { TCredential } from "@skaldapp/shared";
+import type { TCredentials } from "@skaldapp/shared";
 
-import VCredsDialog from "components/dialogs/VCredsDialog.vue";
-import VOtpDialog from "components/dialogs/VOtpDialog.vue";
 import { AES, Utf8 } from "crypto-es";
-import ContentPage from "pages/ContentPage.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import MainLayout from "src/layouts/MainLayout.vue";
-import { useDataStore } from "stores/data";
-import { persistent } from "stores/defaults";
-import { useIoStore } from "stores/io";
-import { useMainStore } from "stores/main";
 import { triggerRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+
+import VCredsDialog from "@/components/dialogs/VCredsDialog.vue";
+import VOtpDialog from "@/components/dialogs/VOtpDialog.vue";
+import MainLayout from "@/layouts/MainLayout.vue";
+import ContentPage from "@/pages/ContentPage.vue";
+import { useDataStore } from "@/stores/data";
+import { persistent } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
+import { useMainStore } from "@/stores/main";
 
 const $q = useQuasar(),
   APP_VERSION = __APP_VERSION__,
@@ -92,7 +93,7 @@ const $q = useQuasar(),
   ioStore = useIoStore(),
   mainStore = useMainStore(),
   router = useRouter(),
-  { credential } = storeToRefs(mainStore),
+  { credentials } = storeToRefs(mainStore),
   { headBucket, setFileSystemDirectoryHandle } = ioStore,
   { rightDrawer } = storeToRefs(dataStore),
   { t } = useI18n();
@@ -115,7 +116,7 @@ const add = () => {
     if ($q.platform.is.electron) {
       const {
         filePaths: [filePath],
-      } = await window.dialog.showOpenDialog({
+      } = await window.showOpenDialog({
         properties: ["openDirectory"],
       });
       if (filePath) directLogin(filePath);
@@ -133,10 +134,10 @@ const add = () => {
   },
   getPin = async (name: string): Promise<string | undefined> =>
     new Promise((resolve, reject) => {
-      if (name !== credential.value[name]?.Bucket) {
+      if (name !== credentials.value[name]?.Bucket) {
         $q.dialog({
           component: VOtpDialog,
-          componentProps: { model: credential.value[name]?.Bucket },
+          componentProps: { model: credentials.value[name]?.Bucket },
         })
           .onOk((payload: string) => {
             resolve(payload);
@@ -152,24 +153,24 @@ const add = () => {
       component: VOtpDialog,
       componentProps: {
         model:
-          name === credential.value[name]?.Bucket
+          name === credentials.value[name]?.Bucket
             ? undefined
-            : credential.value[name]?.Bucket,
+            : credentials.value[name]?.Bucket,
       },
     }).onOk((payload: string) => {
-      const cred = credential.value[name];
+      const cred = credentials.value[name];
       if (cred)
         if (name === cred.Bucket)
           Object.keys(cred).forEach((key) => {
-            cred[key as keyof TCredential] = AES.encrypt(
-              cred[key as keyof TCredential] ?? "",
+            cred[key as keyof TCredentials] = AES.encrypt(
+              cred[key as keyof TCredentials] ?? "",
               payload,
             ).toString();
           });
         else
           Object.keys(cred).forEach((key) => {
-            cred[key as keyof TCredential] = AES.decrypt(
-              cred[key as keyof TCredential] ?? "",
+            cred[key as keyof TCredentials] = AES.decrypt(
+              cred[key as keyof TCredentials] ?? "",
               payload,
             ).toString(Utf8);
           });
@@ -190,8 +191,8 @@ const add = () => {
       message: t("Do you really want to remove an account from the list?"),
       title: t("Confirm"),
     }).onOk(() => {
-      Reflect.deleteProperty(credential.value, name.toString());
-      triggerRef(credential);
+      Reflect.deleteProperty(credentials.value, name.toString());
+      triggerRef(credentials);
     });
   };
 
