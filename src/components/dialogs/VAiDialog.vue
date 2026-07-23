@@ -63,9 +63,10 @@ q-dialog(ref="dialogRef", @hide="onDialogHide")
 import type { QInput } from "quasar";
 
 import { useDialogPluginComponent } from "quasar";
-import { useMainStore } from "stores/main";
 import { ref, useTemplateRef, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { useMainStore } from "@/stores/main";
 
 const mainStore = useMainStore(),
   apiKey = ref(mainStore.openAI.apiKey),
