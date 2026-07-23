@@ -26,12 +26,13 @@ import { split } from "hexo-front-matter";
 import { storeToRefs } from "pinia";
 import { highlight, languages } from "prismjs";
 import { useQuasar } from "quasar";
-import { useDataStore } from "stores/data";
-import { cancel, deep, immediate, persistent } from "stores/defaults";
-import { useIoStore } from "stores/io";
-import { useMainStore } from "stores/main";
 import { onUnmounted, toRefs, watch } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { useDataStore } from "@/stores/data";
+import { cancel, deep, immediate, persistent } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
+import { useMainStore } from "@/stores/main";
 
 const $q = useQuasar(),
   blockCaptionPlaceholderText = "Write Image Title",
@@ -217,6 +218,9 @@ onUnmounted(clearUrls);
 </script>
 
 <style scoped lang="scss">
+:deep(.milkdown) {
+  height: 100%;
+}
 :deep(.milkdown) .ProseMirror {
   @media (max-width: $breakpoint-sm-max) {
     padding-right: 60px;
