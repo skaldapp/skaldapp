@@ -92,11 +92,12 @@ import { Icon } from "@iconify/vue";
 import { sharedStore } from "@skaldapp/shared";
 import { storeToRefs } from "pinia";
 import { debounce, useQuasar } from "quasar";
-import { useDataStore } from "stores/data";
-import { cancel, deep, immediate, persistent, second } from "stores/defaults";
-import { useIoStore } from "stores/io";
 import { computed, ref, toRefs, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { useDataStore } from "@/stores/data";
+import { cancel, deep, immediate, persistent, second } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
