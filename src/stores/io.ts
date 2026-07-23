@@ -9,8 +9,9 @@ import * as fsa from "@skaldapp/fsa";
 import { FetchHttpHandler } from "@smithy/fetch-http-handler";
 import { AES, Utf8 } from "crypto-es";
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
-import { useMainStore } from "stores/main";
 import { ref } from "vue";
+
+import { useMainStore } from "@/stores/main";
 
 export const useIoStore = defineStore("io", () => {
   let fileSystemDirectoryHandle: FileSystemDirectoryHandle | undefined,
@@ -21,7 +22,7 @@ export const useIoStore = defineStore("io", () => {
       s3?.destroy();
       s3 = value;
     },
-    { credential } = storeToRefs(useMainStore());
+    { credentials } = storeToRefs(useMainStore());
 
   const bucket = ref(""),
     deleteObject = async (Key: string) => {
@@ -73,7 +74,7 @@ export const useIoStore = defineStore("io", () => {
         endpoint = null,
         region = null,
         secretAccessKey = null,
-      } = credential.value[Bucket] ?? {};
+      } = credentials.value[Bucket] ?? {};
       if (pin) {
         accessKeyId = AES.decrypt(accessKeyId ?? "", pin).toString(Utf8);
         endpoint = AES.decrypt(endpoint ?? "", pin).toString(Utf8);
