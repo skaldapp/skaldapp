@@ -20,12 +20,6 @@ q-layout(view="hHh LpR fff", @keyup.esc="rightDrawer = false")
           style="margin-top: 1px"
         )
         | LD
-      q-chip.q-mx-md(
-        v-if="bucket",
-        icon="language",
-        :label="bucket",
-        :ripple="false"
-      )
       q-toggle(
         v-model="$q.dark.isActive",
         checked-icon="dark_mode",
@@ -46,12 +40,13 @@ q-layout(view="hHh LpR fff", @keyup.esc="rightDrawer = false")
 
 <script setup lang="ts">
 import { fasMountain } from "@quasar/extras/fontawesome-v7";
-import VMainMenu from "components/VMainMenu.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { useDataStore } from "stores/data";
-import { useIoStore } from "stores/io";
 import { toRefs, watch } from "vue";
+
+import VMainMenu from "@/components/VMainMenu.vue";
+import { useDataStore } from "@/stores/data";
+import { useIoStore } from "@/stores/io";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
