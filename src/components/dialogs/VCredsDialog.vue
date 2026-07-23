@@ -73,17 +73,18 @@ q-dialog(ref="dialogRef", @hide="onDialogHide")
 </template>
 
 <script setup lang="ts">
-import type { TCredential } from "@skaldapp/shared";
+import type { TCredentials } from "@skaldapp/shared";
 import type { QInput } from "quasar";
 
-import options from "assets/endpoints.json";
-import regions from "assets/regions.json";
 import { AES, Utf8 } from "crypto-es";
 import { storeToRefs } from "pinia";
 import { useDialogPluginComponent, useQuasar } from "quasar";
-import { useMainStore } from "stores/main";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+
+import options from "@/assets/endpoints.json";
+import regions from "@/assets/regions.json";
+import { useMainStore } from "@/stores/main";
 
 const { model = "", pin = null } = defineProps<{
   model?: string;
@@ -93,7 +94,7 @@ const { model = "", pin = null } = defineProps<{
 const bucketRef = useTemplateRef<QInput>("bucketRef"),
   isPwd = ref(true),
   mainStore = useMainStore(),
-  { credential } = storeToRefs(mainStore),
+  { credentials } = storeToRefs(mainStore),
   { dialogRef, onDialogCancel, onDialogHide, onDialogOK } =
     useDialogPluginComponent(),
   { t } = useI18n();
@@ -101,29 +102,34 @@ const bucketRef = useTemplateRef<QInput>("bucketRef"),
 const $q = useQuasar(),
   decrypt = (value?: string) =>
     pin ? AES.decrypt(value ?? "", pin).toString(Utf8) : (value ?? null),
-  accessKeyId = ref(decrypt(credential.value[model]?.accessKeyId ?? undefined)),
-  Bucket = ref(decrypt(credential.value[model]?.Bucket ?? undefined)),
-  endpoint = ref(decrypt(credential.value[model]?.endpoint ?? undefined)),
-  region = ref(decrypt(credential.value[model]?.region ?? undefined)),
+  accessKeyId = ref(
+    decrypt(credentials.value[model]?.accessKeyId ?? undefined),
+  ),
+  Bucket = ref(decrypt(credentials.value[model]?.Bucket ?? undefined)),
+  endpoint = ref(decrypt(credentials.value[model]?.endpoint ?? undefined)),
+  region = ref(decrypt(credentials.value[model]?.region ?? undefined)),
   secretAccessKey = ref(
-    decrypt(credential.value[model]?.secretAccessKey ?? undefined),
+    decrypt(credentials.value[model]?.secretAccessKey ?? undefined),
   );
 
-const click = (value: TCredential) => {
+const click = (value: TCredentials) => {
     if (Bucket.value)
-      if (model !== Bucket.value && Reflect.has(credential.value, Bucket.value))
+      if (
+        model !== Bucket.value &&
+        Reflect.has(credentials.value, Bucket.value)
+      )
         $q.dialog({
           message: t("That account already exists"),
           title: t("Confirm"),
         });
       else {
         if (model && model !== Bucket.value)
-          Reflect.deleteProperty(credential.value, model);
-        credential.value[Bucket.value] = value;
+          Reflect.deleteProperty(credentials.value, model);
+        credentials.value[Bucket.value] = value;
         onDialogOK();
       }
   },
-  encrypt = (obj: TCredential) =>
+  encrypt = (obj: TCredentials) =>
     (pin
       ? Object.fromEntries(
           Object.entries(obj).map(([key, value]) => [
@@ -131,7 +137,7 @@ const click = (value: TCredential) => {
             AES.encrypt(value ?? "", pin).toString(),
           ]),
         )
-      : obj) as TCredential,
+      : obj) as TCredentials,
   getRegions = (value: null | string) => regions[(value ?? "") as keyof object];
 
 defineEmits(useDialogPluginComponent.emits);
