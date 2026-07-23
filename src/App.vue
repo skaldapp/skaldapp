@@ -8,10 +8,11 @@ import { useFetch } from "@vueuse/core";
 import { jsonrepair } from "jsonrepair";
 import { editor } from "monaco-editor";
 import { storeToRefs } from "pinia";
-import { useDataStore } from "stores/data";
-import { cache, writable } from "stores/defaults";
-import { useIoStore } from "stores/io";
 import { toRefs, watch } from "vue";
+
+import { useDataStore } from "@/stores/data";
+import { cache } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
 
 const dataStore = useDataStore(),
   ioStore = useIoStore(),
@@ -22,18 +23,8 @@ const dataStore = useDataStore(),
   >(),
   { deleteObject, getObjectText, headObject, putObject } = ioStore,
   { domain } = storeToRefs(dataStore),
-  { nodes, tree } = toRefs(sharedStore),
-  { putPages } = dataStore;
-
-watch(nodes, (value) => {
-  value.forEach((object) => {
-    if (!("contenteditable" in object))
-      Object.defineProperty(object, "contenteditable", {
-        value: false,
-        writable,
-      });
-  });
-});
+  { putPages } = dataStore,
+  { tree } = toRefs(sharedStore);
 
 watch(bucket, async (value) => {
   if (value) {
