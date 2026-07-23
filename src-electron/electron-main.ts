@@ -95,11 +95,11 @@ ipcMain.handle("dialog:showOpenDialog", async (event, options) => {
   return await dialog.showOpenDialog(options);
 });
 
-void app.whenReady().then(async () => {
+void app.whenReady().then(() => {
   // eslint-disable-next-line import-x/no-named-as-default-member
   const { autoUpdater } = electronUpdater;
+  registerQuasarRuntime();
   void autoUpdater.checkForUpdatesAndNotify();
-  await registerQuasarRuntime();
   void createWindow();
   app.on("activate", () => {
     if (!BrowserWindow.getAllWindows().length) void createWindow();
