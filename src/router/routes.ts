@@ -1,5 +1,5 @@
-import MainLayout from "layouts/MainLayout.vue";
-import HomePage from "pages/HomePage.vue";
+import MainLayout from "@/layouts/MainLayout.vue";
+import HomePage from "@/pages/HomePage.vue";
 
 export default [
   {
