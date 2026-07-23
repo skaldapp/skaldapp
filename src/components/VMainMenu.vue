@@ -29,15 +29,16 @@ q-btn-dropdown.q-mr-xs(auto-close, dropdown-icon="apps", flat, square, stretch)
 </template>
 
 <script setup lang="ts">
-import VAiDialog from "components/dialogs/VAiDialog.vue";
-import VFaviconDialog from "components/dialogs/VFaviconDialog.vue";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { useDataStore } from "stores/data";
-import { cache, cancel, persistent } from "stores/defaults";
-import { useIoStore } from "stores/io";
-import { useMainStore } from "stores/main";
 import { useI18n } from "vue-i18n";
+
+import VAiDialog from "@/components/dialogs/VAiDialog.vue";
+import VFaviconDialog from "@/components/dialogs/VFaviconDialog.vue";
+import { useDataStore } from "@/stores/data";
+import { cache, cancel, persistent } from "@/stores/defaults";
+import { useIoStore } from "@/stores/io";
+import { useMainStore } from "@/stores/main";
 
 const $q = useQuasar(),
   dataStore = useDataStore(),
