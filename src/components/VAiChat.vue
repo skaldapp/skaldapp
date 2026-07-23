@@ -1,7 +1,7 @@
 <template lang="pug">
 .scroll.q-pa-md.col.self-stretch
   q-chat-message(
-    v-for="({ parts, role, id }, index) in chat.messages",
+    v-for="({ parts, role, id }, index) in messages",
     :key="id",
     ref="chatMessages",
     :sent="role === 'user'"
@@ -18,39 +18,39 @@
     )
     template(#stamp)
       q-spinner-dots(
-        v-if="index === chat.messages.length - 1 && ['submitted', 'streaming'].includes(chat.status)",
+        v-if="index === messages.length - 1 && ['submitted', 'streaming'].includes(status)",
         size="md"
       )
   q-banner.text-white.bg-red(
-    v-if="chat.error",
+    v-if="error",
     ref="errorBanner",
     dense,
     inline-actions,
     rounded
-  ) {{ chat.error?.message }}
+  ) {{ error?.message }}
     template(#action)
-      q-btn(color="white", flat, icon="replay", @click="chat.regenerate()")
+      q-btn(color="white", flat, icon="replay", @click="regenerate()")
 q-input.q-ma-md(
   ref="input",
   v-model="message",
   autofocus,
   autogrow,
   class="max-h-1/3",
-  :disable="['submitted', 'streaming'].includes(chat.status)",
+  :disable="['submitted', 'streaming'].includes(status)",
   input-class="max-h-full",
   :label="t('How can I help you today?')",
   @keydown.enter="!$event.shiftKey && ($event.preventDefault(), send())"
 )
   template(#after)
     q-btn(
-      v-if="!['submitted', 'streaming'].includes(chat.status)",
+      v-if="!['submitted', 'streaming'].includes(status)",
       dense,
       flat,
       icon="send",
       round,
       @click="send"
     )
-    q-btn(v-else, dense, flat, icon="stop_circle", round, @click="chat.stop()")
+    q-btn(v-else, dense, flat, icon="stop_circle", round, @click="stop")
 </template>
 <script setup lang="ts">
 import type { ChatTransport, LanguageModel, UIMessage } from "ai";
@@ -58,9 +58,9 @@ import type { QInput } from "quasar";
 import type { ComponentPublicInstance } from "vue";
 
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { Chat } from "@ai-sdk/vue";
+import { useChat } from "@ai-sdk/vue";
 import { whenever } from "@vueuse/core";
-import { convertToModelMessages, streamText } from "ai";
+import { convertToModelMessages, streamText, toUIMessageStream } from "ai";
 import abbreviation from "markdown-it-abbr";
 import deflist from "markdown-it-deflist";
 import { full as emoji } from "markdown-it-emoji";
@@ -71,11 +71,12 @@ import subscript from "markdown-it-sub";
 import superscript from "markdown-it-sup";
 import taskLists from "markdown-it-task-lists";
 import { storeToRefs } from "pinia";
-import { useDataStore } from "stores/data";
-import { deep, immediate } from "stores/defaults";
-import { useMainStore } from "stores/main";
-import { nextTick, ref, useTemplateRef, watch } from "vue";
+import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { useDataStore } from "@/stores/data";
+import { deep, immediate } from "@/stores/defaults";
+import { useMainStore } from "@/stores/main";
 
 class CustomChatTransport implements ChatTransport<UIMessage> {
   private model: LanguageModel | undefined;
@@ -88,13 +89,14 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
   async sendMessages({
     messages,
   }: Parameters<ChatTransport<UIMessage>["sendMessages"]>[0]) {
-    if (this.model) {
-      const result = streamText({
-        messages: await convertToModelMessages(messages),
-        model: this.model,
-      });
-      return result.toUIMessageStream();
-    } else throw new Error("The model is not defined.");
+    if (this.model)
+      return toUIMessageStream(
+        streamText({
+          messages: await convertToModelMessages(messages),
+          model: this.model,
+        }),
+      );
+    else throw new Error("The model is not defined.");
   }
   updateModel(model: LanguageModel | undefined) {
     this.model = model;
@@ -102,8 +104,6 @@ class CustomChatTransport implements ChatTransport<UIMessage> {
 }
 
 const block = "end",
-  transport = new CustomChatTransport(),
-  chat = new Chat({ transport }),
   chatMessages = useTemplateRef<ComponentPublicInstance[]>("chatMessages"),
   dataStore = useDataStore(),
   errorBanner = useTemplateRef<ComponentPublicInstance>("errorBanner"),
@@ -122,15 +122,21 @@ const block = "end",
     superscript,
     taskLists,
   ],
-  send = () => {
-    if (["error", "ready"].includes(chat.status)) {
-      void chat.sendMessage({ text: message.value });
-      message.value = "";
-    }
-  },
+  transport = new CustomChatTransport(),
+  { error, messages, regenerate, sendMessage, status, stop } = useChat({
+    transport,
+  }),
   { openAI } = storeToRefs(mainStore),
   { rightDrawer } = storeToRefs(dataStore),
   { t } = useI18n();
+
+const lastMessage = computed(() => messages.value[messages.value.length - 1]),
+  send = () => {
+    if (["error", "ready"].includes(status.value)) {
+      void sendMessage({ text: message.value });
+      message.value = "";
+    }
+  };
 
 watch(
   openAI,
@@ -144,27 +150,21 @@ watch(
   { deep, immediate },
 );
 
-watch(
-  () => chat.lastMessage,
-  async () => {
+watch(lastMessage, async () => {
+  await nextTick();
+  chatMessages.value?.[chatMessages.value.length - 1]?.$el.scrollIntoView({
+    block,
+  });
+});
+
+watch(error, async (value) => {
+  if (value) {
     await nextTick();
-    chatMessages.value?.[chatMessages.value.length - 1]?.$el.scrollIntoView({
+    errorBanner.value?.$el.scrollIntoView({
       block,
     });
-  },
-);
-
-watch(
-  () => chat.error,
-  async (value) => {
-    if (value) {
-      await nextTick();
-      errorBanner.value?.$el.scrollIntoView({
-        block,
-      });
-    }
-  },
-);
+  }
+});
 
 whenever(rightDrawer, () => {
   input.value?.focus();
