@@ -1,11 +1,11 @@
 import { sharedStore } from "@skaldapp/shared";
 import { storeToRefs } from "pinia";
-import routes from "src/router/routes";
-import { useDataStore } from "stores/data";
-import { useIoStore } from "stores/io";
 import { toRefs } from "vue";
 
-import { defineBoot } from "#q-app/wrappers";
+import { defineBoot } from "#q-app";
+import routes from "@/router/routes";
+import { useDataStore } from "@/stores/data";
+import { useIoStore } from "@/stores/io";
 
 const [route] = routes,
   dataStore = useDataStore(),
