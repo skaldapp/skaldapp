@@ -1,5 +1,5 @@
 <template lang="pug">
-.full-width.full-height(ref="monacoRef")
+div(ref="monacoRef")
 </template>
 
 <script setup lang="ts">
@@ -16,10 +16,11 @@ import * as monaco from "monaco-editor";
 import { registerCompletion } from "monacopilot";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { useDataStore } from "stores/data";
-import { deep, enabled, immediate, technologies } from "stores/defaults";
-import { useMainStore } from "stores/main";
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
+
+import { useDataStore } from "@/stores/data";
+import { deep, enabled, immediate, technologies } from "@/stores/defaults";
+import { useMainStore } from "@/stores/main";
 
 let bracketMatcherDisposable: monaco.IDisposable | null = null,
   completion: CompletionRegistration | null = null,
