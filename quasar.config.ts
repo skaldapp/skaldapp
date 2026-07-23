@@ -1,13 +1,10 @@
-import { fileURLToPath } from "url";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
-import { defineConfig } from "#q-app/wrappers";
+import { defineConfig } from "#q-app";
 
-const alias = { "node:path": "path-browserify" },
-  appId = "skald",
+const appId = "skald",
   base = "./",
   boot = ["main", "route", "i18n", "monaco"],
-  browser = ["es2022", "firefox115", "chrome115", "safari15"],
   bundler = "builder",
   channels = ["stable"],
   css = [
@@ -29,7 +26,6 @@ const alias = { "node:path": "path-browserify" },
   useFlatConfig = true,
   eslint = { lintCommand, useFlatConfig },
   identity = "-",
-  include = [fileURLToPath(new URL("./src/i18n", import.meta.url))],
   mac = { darkModeSupport, identity },
   preloadScripts = ["electron-preload"],
   releaseNotesFile = "release-notes.md",
@@ -40,7 +36,6 @@ const alias = { "node:path": "path-browserify" },
   server = false,
   src = "./node_modules/@skaldapp/runtime/dist",
   strict = true,
-  target = { browser },
   targets = [{ dest, rename, src }],
   vueShim = true,
   typescript = { strict, vueShim },
@@ -52,16 +47,17 @@ const extendViteConf = () => ({
   plugins: [viteStaticCopy({ targets })],
 });
 
-export default defineConfig(() => ({
+export default defineConfig((ctx) => ({
   animations: ["zoomIn", "zoomOut"],
   boot,
   build: {
-    alias,
     extendViteConf,
-    target,
     typescript,
     vitePlugins: [
-      ["@intlify/unplugin-vue-i18n/vite", { include }],
+      [
+        "@intlify/unplugin-vue-i18n/vite",
+        { include: [ctx.appPaths.resolve.app("src/i18n")] },
+      ],
       ["vite-plugin-checker", { eslint, vueTsc }, { server }],
     ],
   },
