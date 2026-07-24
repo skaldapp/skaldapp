@@ -98,6 +98,7 @@
     "@skaldapp/runtime": "^3.4.10",
     "@types/markdown-it-emoji": "^3.0.1",
     "@types/markdown-it-footnote": "^3.0.4",
+    "@types/node": "^26.1.1",
     "@types/prismjs": "^1.26.6",
     "@types/wicg-file-system-access": "^2023.10.7",
     "@unocss/vite": "^66.7.5",
