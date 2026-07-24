@@ -12,8 +12,12 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
-      - run: npm ci
-      - run: npm run build
+      - run: |
+          cd src-electron
+          npm ci
+          cd ..
+          npm ci
+          npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/spa/
