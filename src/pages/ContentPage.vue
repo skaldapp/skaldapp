@@ -59,7 +59,7 @@ q-page.column.full-height.bg-light(v-else)
     q-spinner-hourglass
 q-footer
   .row.no-wrap
-    .col-12.col-xs-6.col-sm-5.col-md-4.col-lg-3.row.no-wrap
+    .col-12.col-sm-8.col-md-6.col-lg-4.row.no-wrap
       q-chip.max-w-third(icon="folder", :ripple="false", size="sm", square)
         template(#default)
           .ellipsis.text-left.rtl {{ bucket }}
