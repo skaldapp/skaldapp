@@ -24,7 +24,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: release-notes
-          path: src-electron/release-notes.md
+          path: release-notes.md
           retention-days: 1
   build:
     needs: release
@@ -42,6 +42,7 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           name: release-notes
+          path: src-electron
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
