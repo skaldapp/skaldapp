@@ -17,7 +17,7 @@ const deleteObject = (input: DeleteObjectCommandInput) =>
     ipcRenderer.invoke("fs:headObject", input),
   putObject = (input: PutObjectCommandInput) =>
     ipcRenderer.invoke("fs:putObject", input),
-  removeEmptyDirectories = async (directory: string, exclude: string[]) =>
+  removeEmptyDirectories = (directory: string, exclude: string[]) =>
     ipcRenderer.invoke("fs:removeEmptyDirectories", directory, exclude),
   showOpenDialog = (options: Electron.OpenDialogOptions) =>
     ipcRenderer.invoke("dialog:showOpenDialog", options);
