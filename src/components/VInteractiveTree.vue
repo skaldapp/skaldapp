@@ -35,7 +35,7 @@ q-select(
         v-intersection="onIntersection",
         :data-id="prop.node.id",
         @dblclick="prop.node.contenteditable = true",
-        @keypress.stop
+        @keydown.stop
       )
         q-input.full-width(
           v-model.trim="prop.node.name",
