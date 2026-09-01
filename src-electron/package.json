@@ -5,12 +5,12 @@
   "description": "Quasar Electron Folder",
   "type": "module",
   "dependencies": {
-    "@quasar/app-vite": "^3.3.0",
+    "@quasar/app-vite": "^3.8.1",
     "electron-updater": "^6.8.9",
     "mime": "^4.1.0"
   },
   "devDependencies": {
-    "electron": "^43.2.0",
+    "electron": "^44.1.0",
     "electron-builder": "^26.15.3"
   }
 }
