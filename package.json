@@ -95,7 +95,7 @@
     "@intlify/unplugin-vue-i18n": "^11.2.5",
     "@quasar/quasar-app-extension-qmarkdown": "^4.2.1",
     "@skaldapp/configs": "^1.6.3",
-    "@skaldapp/runtime": "^3.6.4",
+    "@skaldapp/runtime": "^3.7.0",
     "@types/markdown-it-emoji": "^3.0.1",
     "@types/markdown-it-footnote": "^3.0.4",
     "@types/node": "^26.5.0",
