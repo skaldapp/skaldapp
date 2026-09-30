@@ -198,7 +198,6 @@ const cleaner = (value: TPage[]) => {
       entry.target.dataset.id === selected.value
     )
       visible.value = entry.isIntersecting;
-    return true;
   },
   options = computed(() =>
     keywords.value.filter((keyword) => keyword.includes(needle.value)),
