@@ -1,4 +1,4 @@
-name: ELECTRON
+name: electron
 on:
   push:
     tags:
