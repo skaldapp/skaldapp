@@ -25,7 +25,9 @@ const appId = "skald",
   lintCommand = "eslint -c ./eslint.config.ts src src-electron",
   useFlatConfig = true,
   eslint = { lintCommand, useFlatConfig },
+  executableArgs = ["--ozone-platform=x11"],
   identity = "-",
+  linux = { executableArgs },
   mac = { darkModeSupport, identity },
   preloadScripts = ["electron-preload"],
   releaseNotesFile = "release-notes.md",
@@ -66,6 +68,7 @@ export default defineConfig((ctx) => ({
   electron: {
     builder: {
       appId,
+      linux,
       mac,
       publish: [{ provider: "github", releaseType }],
       releaseInfo,
