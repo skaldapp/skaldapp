@@ -1,4 +1,4 @@
-name: SPA
+name: spa
 on:
   push:
     tags:
@@ -21,6 +21,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist/spa/
+          include-hidden-files: true
   deploy:
     needs: build
     permissions:
