@@ -38,8 +38,8 @@ q-page.column.full-height(v-if="the")
     indicator-color="primary",
     narrow-indicator
   )
-    q-tab(label="wysiwyg", name="wysiwyg")
-    q-tab(label="markdown", name="md")
+    q-tab(label="markdown mode", name="wysiwyg")
+    q-tab(label="vue mode", name="text")
   q-tab-panels.full-width.col(v-if="selected", v-model="tab")
     q-tab-panel.q-px-none(name="wysiwyg")
       Suspense
@@ -48,7 +48,7 @@ q-page.column.full-height(v-if="the")
         template(#fallback)
           q-inner-loading(showing)
             q-spinner-hourglass
-    q-tab-panel(name="md")
+    q-tab-panel(name="text")
       Suspense
         v-monaco-editor.full-height.full-width
           template(#fallback)
