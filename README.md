@@ -1,8 +1,25 @@
 # Skald
 
-**Skald** – a tree-structured content editor where thought finds structure
+#### markdown and vue editor, static site generator
 
-Create notes, articles, and knowledge bases in an intuitive visual editor. Publish the result with one click — or simply work locally. Complex tools are only invoked when you need them.
+---
+
+✌️ Two editing modes:
+
+- visual for markdown
+- syntax highlighting for vue
+
+🧩 Using vue in markdown like in [vitepress](https://vitepress.dev/guide/using-vue)\
+🧱 You can use [component syntax in markdown](https://comark.dev/syntax/components)\
+🎨 Built-in support for tailwind 4 classes for styling\
+🌳 Tree structure with vue router support\
+🏷️ Manage page attributes via frontmatter\
+📦 Direct import of Vue components and modules from: https://esm.run, https://esm.sh, https://esm.unpkg.com, https://skypack.dev \
+🤖 OpenAI support for code and text autocomplete, built-in chatbot
+
+🪄 **And now the main magic** — copy the created content to any web server or publish it to github pages and the site comes alive.
+
+> No settings, no precompilation, no build. Just copy.
 
 ## 📥 Download
 
@@ -19,65 +36,35 @@ Create notes, articles, and knowledge bases in an intuitive visual editor. Publi
 <img alt="Skald" src="https://skaldapp.github.io/uploads/light.png">
 </picture>
 
-## Content that lives in your structure
-
-- 💻 **Work with a tree hierarchy** of documents in the way that suits you
-
-- ✍️ **The visual editor** hides technical details but leaves you in full control of formatting
-
-- 🌐 **Build‑free publishing**: just copy the project folder to any hosting that supports static files
-
-- 🔁 **Lossless migration**: move content to another platform without complex conversions
-
-> **Your content — your property**\
-> Skald doesn’t lock you into a platform. Your files are stored locally in standard formats (Markdown, JSON). Open formats mean freedom of choice today and content preservation tomorrow.
-
----
-
-## Skald — for those who work with structured content
-
-If you work with hierarchical information — Skald is made for you.
-
-| Audience                 | Use case                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------- |
-| ✍️ Researchers & authors | Organizing drafts, sources, and notes into a single tree‑structured base        |
-| 📚 Technical writers     | Creating documentation with a clear hierarchy and instant publishing capability |
-| 🎓 Educators & students  | Structuring learning materials, notes, and study guides                         |
-| 💻 Developers            | Maintaining project documentation, personal wikis, rapid interface prototypes   |
-
----
-
 ## Functionality levels
 
-> Each level is not about more features, but about fewer obstacles between you and the result.
+### 🟢 Simple
 
-### 🟢 EASY
-
-Start writing within 30 seconds of launching. No setup — just text and structure.
+Start writing immediately after launch. No setup — just text and structure.
 
 - Write, structure, organize
 
-- Visual editor and tree navigation help you stay focused on content
+- The visual editor and tree navigation help you keep focus on the content
 
-- Ideal for those who want to work immediately, without learning tools
+- Ideal for those who want to work right away without learning the tools
 
-[More about the easy mode →](https://skaldapp.github.io/easy/)
+[Learn more about simple mode →](https://skaldapp.github.io/easy/)
 
-### 🔴 ADVANCED
+### 🔴 Advanced
 
-Add formatting and metadata in the same interface. Don’t switch between tools — don’t lose context.
+Add formatting and metadata in the same interface. Don't switch between tools — don't lose context.
 
-- Fine‑tune style via HTML and TailwindCSS
+- Fine-tune styling via HTML and TailwindCSS
 
 - Manage metadata without leaving the editor
 
-- Professional content styling within your usual workflow
+- Professional content formatting in your usual workflow
 
-[More about the advanced mode →](https://skaldapp.github.io/medium/)
+[Learn more about advanced mode →](https://skaldapp.github.io/medium/)
 
-### 🔵 PROFESSIONAL
+### 🔵 Professional
 
-Embed interactivity without leaving the editor. No build configuration — just write code where it’s needed.
+Embed interactivity without leaving the editor. Don't configure a build — just write code where it is needed.
 
 - Reactivity via Vue components right in the text
 
@@ -85,50 +72,45 @@ Embed interactivity without leaving the editor. No build configuration — just 
 
 - Full integration with the frontend stack without compromises
 
-[More about the professional mode →](https://skaldapp.github.io/hard/)
-
----
-
-## 🤖 Your personal AI assistant
-
-- 💡 **Content generation** — creative ideas in an interactive chat
-
-- ✏️ **Smart autocomplete** — text in the visual editor
-
-- 🛠️ **Code autocomplete** — Vue.js support
+[Learn more about professional mode →](https://skaldapp.github.io/hard/)
 
 ---
 
 ## ❓ Q&A
 
-🤔 **How is Skald different from other Markdown editors?**\
-Skald combines the freedom of a text editor with the discipline of structured data. You work with a tree hierarchy of documents in a visual interface, and the result — whether a local note or a public page — is always under your full control. Publishing doesn’t require a separate build process: the structure you see in the editor is the final product.
+🤔 **How is Skald different from other Markdown editors?**
 
-🤔 **What can you do with Skald?**\
-Create and organize any tree‑structured content: from personal notes and book drafts to technical documentation and knowledge bases. Skald provides a unified space for writing, structuring, and (when needed) publishing. You can work completely offline, sync with the cloud, or instantly publish the result online — the strategy is up to you.
+In Skald you write texts, not program. Skald automatically turns texts into a website. Publishing does not require a separate build process: the structure you see in the editor is the final product.
 
-🤔 **How to preview a site in the browser during development?**\
-There are many ways. If you’re comfortable with the command line, follow the advice from the official Vue.js website:
+🤔 **What can you do with Skald?**
 
-> To start a local HTTP server, install Node.js, then run the command `npx serve` in the project directory. You can also use any other HTTP server that supports static files with correct MIME types.
+Create and organize any tree-structured content: from personal notes and book drafts to technical documentation and knowledge bases. Skald is a flexible tool for working with text that can be as simple as a blog or as complex as a web application.
 
-A simpler way is the program [Simple Web Server](https://simplewebserver.org). It’s free, cross‑platform, and lets you start a local server with a couple of clicks.
+🤔 **How can I view the site in a browser during development?**
 
-🤔 **Besides the file system, what storage systems does Skald work with?**\
-In addition to the local file system (via the File System Access API), Skald supports any S3‑compatible cloud storage: AWS S3, MinIO, Cloudflare R2, DigitalOcean Spaces, and others. When connected, data is encrypted, it supports working with multiple accounts, and access can be protected by a PIN.
+There are many ways. If you are comfortable with computers, use the advice from the official Vue.js website:
 
-In the Electron version, files are saved locally, ensuring full offline work without dependency on browser restrictions.
+> To run a local HTTP server, install Node.js, then run the command `npx serve` in the project directory. You can also use any other HTTP server that supports static files with the correct MIME types.
 
-🤔 **Can S3 storage be used as static hosting?**\
-Yes, most S3‑compatible services (AWS S3, Cloudflare R2, DigitalOcean Spaces) support static website hosting mode. Just enable the option in the bucket settings — and its contents become accessible via a public URL. Skald content can be published directly: the site becomes available online immediately without extra configuration.
+A simpler way is the [Simple Web Server](https://simplewebserver.org) program. It is free, cross-platform, and lets you start a local server in a couple of clicks.
 
-🤔 **Can I use Skald offline?**\
-Yes. The Electron version provides full autonomy with native file system access. The browser version also works offline after the initial cache load.
+🤔 **Besides the file system, what storage systems does Skald work with?**
 
-Features requiring internet (S3 sync, AI integration) are temporarily unavailable offline, but all core operations — editing, saving, navigation — function fully autonomously.
+In addition to the local file system, Skald supports any S3-compatible cloud storage: AWS S3, MinIO, Cloudflare R2, DigitalOcean Spaces, and others. When connected, data is encrypted, support for multiple accounts is available, and access protection via PIN code is provided.
 
-🤔 **Is it safe to add secret keys to Skald?**\
-Skald applies basic security measures: keys are stored encrypted, and S3 key access can be protected by a PIN. However, since the app runs client‑side, keys are stored in your device’s local storage.
+🤔 **Can S3 storage act as static hosting?**
+
+Yes, most S3-compatible storages (AWS S3, Cloudflare R2, DigitalOcean Spaces) support static website hosting mode. Just enable the option in the bucket settings — and its contents become available at a public URL. Skald can work with S3-compatible storages directly — the site is immediately available on the internet without additional copying.
+
+🤔 **Can Skald be used offline?**
+
+Yes. The Electron version provides full autonomy with native access to the file system. The browser version also works without a connection after the initial cache load.
+
+Features that require the internet (S3 synchronization, AI integration) are temporarily unavailable when working offline, but all basic operations — editing, saving, navigation — function fully autonomously.
+
+🤔 **Is it safe to add secret keys to Skald?**
+
+Skald applies basic protection measures: keys are stored encrypted, and access to S3 keys can be protected by PIN code. However, since the application runs on the client side, keys are stored in your device's local storage.
 
 Recommendations:
 
@@ -136,11 +118,12 @@ Recommendations:
 
 - Regularly monitor their usage
 
-- Enable local protection via a PIN
+- Enable local protection via PIN code
 
 - Use keys only on trusted devices
 
-🤔 **Which operating systems does Skald support?**\
+🤔 **What operating systems does Skald support?**
+
 Skald works on all major platforms:
 
 - **Browser version**: Chrome, Firefox, Edge, Safari on Windows, macOS, Linux, ChromeOS, and mobile devices
@@ -149,49 +132,18 @@ Skald works on all major platforms:
 
 All key features are available regardless of OS and launch method.
 
-🤔 **Which AI models does Skald support?**\
-Skald implements support for the OpenAI protocol, allowing the connection of any compatible models. The integration enables the following features:
+🤔 **What AI models does Skald support?**
+
+Skald implements support for the OpenAI protocol, which allows connecting any compatible models. The integration enables the following features:
 
 - Content generation;
 
-- Smart text and code autocompletion;
+- Smart text and code autocomplete;
 
 - Interactive chat assistant.
 
-🤔 **Is Node.js required to run Skald?**\
-No. The editor runs entirely client‑side: Vue component compilation, Markdown processing, and site structure generation happen directly in the browser.
+🤔 **Is Node.js required for Skald to work?**
 
-This lets you start working instantly — without installing dependencies, configuring environments, or running build processes.
+No. The editor functions entirely on the client side: compilation of Vue components, Markdown processing, and site structure generation are performed directly in the browser.
 
-🤔 **Was vibe coding used in developing Skald?**\
-No, all code is written by hand — a deliberate architectural choice. Manual development ensures full control over logic, predictable behavior, and high maintainability.
-
-Tech stack:
-
-- TypeScript in strict mode (`strict: true`)
-
-- `@vue/eslint-config-typescript` — strict typing for Vue
-
-- `eslint-plugin-sonarjs` — detection of vulnerabilities and complex patterns
-
-- Prettier + `eslint-plugin-perfectionist` — code formatting
-
-- A suite of plugins for linting styles, manifests, and dependencies
-
-🤔 **What are Skald’s shortcomings?**\
-Skald prioritizes ease of development and instant feedback. Navigation for large projects happens client‑side. For most scenarios (documentation, blogs, knowledge bases) this is unnoticeable.
-
-If you’re building a high‑traffic public portal with millions of visits, you might consider server‑rendered solutions — but then you lose simplicity and editing speed.
-
-🤔 **What are your plans for the future?**\
-We believe the word should take shape without intermediaries. Our mission is to erase the line between conception and publication, so that every person, regardless of technical skill, can easily and confidently share their ideas with the world.
-
-Ahead lies a path toward even greater compatibility, intuitiveness, and accessibility. We strive to make publishing on the internet as natural as writing a letter: _open, write, share_. No setup, no builds, no barriers.
-
----
-
-> Let technology serve people, not the other way around.
-
-🔗 **Official website**: [skaldapp.github.io](https://skaldapp.github.io)\
-🐙 **Source code**: [github.com/skaldapp/skaldapp](https://github.com/skaldapp/skaldapp)\
-📦 **Snap Store**: [snapcraft.io/skaldapp](https://snapcraft.io/skaldapp)
+This allows you to start working instantly — without installing dependencies, setting up an environment, or running build processes.
