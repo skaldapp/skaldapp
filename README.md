@@ -1,6 +1,6 @@
 # Skald - markdown and vue editor, static site generator
 
-![1.00](uploads/skald.jpg){.rounded-xl}
+![1.00](https://skaldapp.github.io/uploads/skald.jpg)
 
 ## 📝 Write in markdown, add vue magic — a convenient editor that can do more
 
