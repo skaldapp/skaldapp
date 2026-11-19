@@ -10,7 +10,7 @@
     "mime": "^4.1.2"
   },
   "devDependencies": {
-    "electron": "^45.3.2",
+    "electron": "^45.4.1",
     "electron-builder": "^26.18.0"
   }
 }
